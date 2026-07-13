@@ -3,3 +3,4 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/eltg1461/public_html/iptul.my.id/
     - /bin/cp -f index.html $DEPLOYPATH
+    - /bin/cp -f .htaccess $DEPLOYPATH
