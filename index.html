@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPTUL.EXE — Pixel Portfolio</title>
+<meta name="description" content="Portofolio Iptul — web developer. Tema retro pixel game 8-bit.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect x='2' y='2' width='12' height='12' fill='%2300e756'/><rect x='4' y='4' width='8' height='8' fill='%23131321'/><rect x='6' y='6' width='4' height='4' fill='%23ffd93d'/></svg>">
+<style>
+  :root {
+    --bg: #131321;
+    --bg2: #1b1b2f;
+    --panel: #22223a;
+    --border: #4a4a6a;
+    --green: #00e756;
+    --yellow: #ffd93d;
+    --red: #ff4d6d;
+    --blue: #29adff;
+    --purple: #b967ff;
+    --text: #e8e8f0;
+    --dim: #9a9ab8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'VT323', monospace;
+    font-size: 22px;
+    line-height: 1.5;
+    image-rendering: pixelated;
+    overflow-x: hidden;
+  }
+  h1, h2, h3, .px { font-family: 'Press Start 2P', monospace; }
+
+  /* ===== scanlines + CRT vibe ===== */
+  body::after {
+    content: "";
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 1px, transparent 1px 3px);
+    pointer-events: none; z-index: 9998;
+  }
+
+  /* ===== pixel border helper ===== */
+  .pixel-box {
+    background: var(--panel);
+    border: 4px solid var(--border);
+    box-shadow: 0 0 0 4px var(--bg), 8px 8px 0 0 rgba(0,0,0,.45);
+    position: relative;
+  }
+
+  /* ===== boot / start screen ===== */
+  #start-screen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 32px; text-align: center; padding: 20px;
+    transition: opacity .4s steps(6), visibility .4s;
+  }
+  #start-screen.hidden { opacity: 0; visibility: hidden; }
+  #start-screen h1 { font-size: clamp(22px, 6vw, 48px); color: var(--green); text-shadow: 4px 4px 0 #045d2b; }
+  #start-screen .sub { color: var(--yellow); font-size: clamp(10px, 2.5vw, 14px); }
+  .blink { animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  #press-start {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(12px, 3vw, 18px);
+    color: var(--text); background: none; border: none; cursor: pointer;
+  }
+  #press-start:hover { color: var(--yellow); }
+
+  /* ===== stars background ===== */
+  .stars { position: fixed; inset: 0; z-index: -1; }
+  .stars span {
+    position: absolute; width: 3px; height: 3px; background: #fff;
+    animation: twinkle 2.4s steps(2) infinite;
+  }
+  @keyframes twinkle { 50% { opacity: .15; } }
+
+  /* ===== nav ===== */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg2);
+    border-bottom: 4px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 20px; flex-wrap: wrap; gap: 10px;
+  }
+  nav .logo { font-family: 'Press Start 2P', monospace; font-size: 14px; color: var(--green); text-decoration: none; }
+  nav .links { display: flex; gap: 6px; flex-wrap: wrap; }
+  nav .links a {
+    font-family: 'Press Start 2P', monospace; font-size: 9px;
+    color: var(--dim); text-decoration: none; padding: 8px 10px;
+    border: 2px solid transparent;
+  }
+  nav .links a:hover { color: var(--yellow); border-color: var(--yellow); }
+  #coins { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--yellow); cursor: pointer; user-select: none; }
+
+  main { max-width: 960px; margin: 0 auto; padding: 40px 20px 80px; }
+  section { margin-bottom: 72px; }
+
+  .section-title {
+    font-size: clamp(14px, 3.5vw, 20px);
+    color: var(--yellow); margin-bottom: 28px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-title::before { content: "▶"; color: var(--green); animation: blink 1.2s steps(2) infinite; }
+
+  /* ===== hero ===== */
+  #hero { display: flex; gap: 36px; align-items: center; flex-wrap: wrap; padding: 28px; }
+  .avatar-frame { padding: 12px; background: var(--bg2); border: 4px solid var(--green); flex-shrink: 0; }
+  #avatar { display: block; width: 128px; height: 128px; }
+  .hero-info { flex: 1; min-width: 260px; }
+  .hero-info h1 { font-size: clamp(18px, 5vw, 30px); color: var(--green); margin-bottom: 10px; text-shadow: 3px 3px 0 #045d2b; }
+  .hero-info .role { color: var(--blue); font-size: clamp(10px, 2.5vw, 13px); min-height: 1.6em; display: block; margin-bottom: 18px; }
+  .hero-info .role::after { content: "█"; animation: blink .8s steps(2) infinite; }
+  .bar-row { display: grid; grid-template-columns: 42px 1fr 64px; align-items: center; gap: 10px; margin-bottom: 10px; font-family: 'Press Start 2P', monospace; font-size: 10px; }
+  .bar { height: 18px; background: #0c0c16; border: 3px solid var(--border); }
+  .bar i { display: block; height: 100%; }
+  .hp i { background: repeating-linear-gradient(90deg, var(--red) 0 8px, #d13657 8px 16px); width: 92%; }
+  .mp i { background: repeating-linear-gradient(90deg, var(--blue) 0 8px, #1e8fd8 8px 16px); width: 78%; }
+  .xp i { background: repeating-linear-gradient(90deg, var(--yellow) 0 8px, #e0b920 8px 16px); width: 64%; animation: xpfill 3s steps(12) both; }
+  @keyframes xpfill { from { width: 0; } }
+
+  /* ===== about (character sheet) ===== */
+  .sheet { padding: 24px; }
+  .sheet p { color: var(--text); margin-bottom: 14px; }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 20px; }
+  .stat { background: var(--bg2); border: 3px solid var(--border); padding: 12px 14px; display: flex; justify-content: space-between; font-family: 'Press Start 2P', monospace; font-size: 9px; }
+  .stat b { color: var(--green); }
+
+  /* ===== skills ===== */
+  .skill { margin-bottom: 20px; }
+  .skill .label { display: flex; justify-content: space-between; font-family: 'Press Start 2P', monospace; font-size: 10px; margin-bottom: 6px; }
+  .skill .label .lv { color: var(--purple); }
+  .skill .bar { height: 22px; }
+  .skill .bar i { background: repeating-linear-gradient(90deg, var(--green) 0 10px, #00b843 10px 20px); width: 0; transition: width 1.4s steps(14); }
+
+  /* ===== quests / projects ===== */
+  .quests { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 24px; }
+  .quest { padding: 20px; display: flex; flex-direction: column; gap: 10px; transition: transform .1s steps(2); }
+  .quest:hover { transform: translate(-4px, -4px); border-color: var(--yellow); }
+  .quest h3 { font-size: 11px; color: var(--blue); line-height: 1.8; }
+  .quest .diff { color: var(--yellow); letter-spacing: 3px; font-size: 18px; }
+  .quest p { color: var(--dim); font-size: 19px; flex: 1; }
+  .quest .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .quest .tags span { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--bg); background: var(--green); padding: 4px 6px; }
+  .quest a {
+    font-family: 'Press Start 2P', monospace; font-size: 9px;
+    color: var(--yellow); text-decoration: none; align-self: flex-start;
+  }
+  .quest a:hover { color: var(--green); }
+  .quest .status { position: absolute; top: -14px; right: 10px; font-family: 'Press Start 2P', monospace; font-size: 8px; padding: 4px 8px; background: var(--red); color: #fff; }
+  .quest .status.done { background: var(--green); color: var(--bg); }
+
+  /* ===== contact ===== */
+  #contact .pixel-box { padding: 32px; text-align: center; }
+  #contact .gameover { font-size: clamp(16px, 4vw, 26px); color: var(--red); text-shadow: 3px 3px 0 #6b1327; margin-bottom: 10px; }
+  #contact .continue { font-family: 'Press Start 2P', monospace; font-size: 11px; color: var(--text); margin-bottom: 26px; }
+  .contact-links { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    font-family: 'Press Start 2P', monospace; font-size: 10px;
+    color: var(--bg); background: var(--green); text-decoration: none;
+    padding: 14px 18px; border: none; cursor: pointer;
+    box-shadow: 0 6px 0 0 #067a33; display: inline-block;
+  }
+  .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 0 #067a33; }
+  .btn.alt { background: var(--blue); box-shadow: 0 6px 0 0 #14649c; }
+  .btn.alt:active { box-shadow: 0 2px 0 0 #14649c; }
+  .btn.alt2 { background: var(--yellow); box-shadow: 0 6px 0 0 #a8871b; }
+  .btn.alt2:active { box-shadow: 0 2px 0 0 #a8871b; }
+
+  footer {
+    text-align: center; padding: 24px; border-top: 4px solid var(--border);
+    background: var(--bg2); font-family: 'Press Start 2P', monospace;
+    font-size: 8px; color: var(--dim); line-height: 2.2;
+  }
+
+  /* konami rainbow mode */
+  body.rainbow { animation: hue 3s linear infinite; }
+  @keyframes hue { to { filter: hue-rotate(360deg); } }
+
+  @media (max-width: 560px) {
+    body { font-size: 19px; }
+    #hero { justify-content: center; text-align: center; }
+    .bar-row { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="start-screen">
+  <h1>IPTUL.EXE</h1>
+  <div class="sub px">— PIXEL PORTFOLIO v1.0 —</div>
+  <button id="press-start" class="blink">▶ PRESS START ◀</button>
+  <div class="sub px" style="color:var(--dim); font-size:8px;">© 2026 IPTUL GAMES · INSERT COIN</div>
+</div>
+
+<div class="stars" id="stars"></div>
+
+<nav>
+  <a class="logo" href="#">IPTUL.EXE</a>
+  <div class="links">
+    <a href="#about">ABOUT</a>
+    <a href="#skills">SKILLS</a>
+    <a href="#quests">QUESTS</a>
+    <a href="#contact">CONTACT</a>
+  </div>
+  <div id="coins" title="klik untuk koin!">🪙 <span id="coin-count">0</span></div>
+</nav>
+
+<main>
+
+  <!-- HERO -->
+  <section>
+    <div id="hero" class="pixel-box">
+      <div class="avatar-frame">
+        <svg id="avatar" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+          <rect width="16" height="16" fill="#1b1b2f"/>
+          <!-- hair -->
+          <rect x="4" y="1" width="8" height="2" fill="#2b2b45"/>
+          <rect x="3" y="2" width="2" height="3" fill="#2b2b45"/>
+          <rect x="11" y="2" width="2" height="3" fill="#2b2b45"/>
+          <!-- face -->
+          <rect x="4" y="3" width="8" height="5" fill="#f2c88f"/>
+          <!-- eyes -->
+          <rect x="5" y="5" width="2" height="2" fill="#131321"/>
+          <rect x="9" y="5" width="2" height="2" fill="#131321"/>
+          <rect x="5" y="5" width="1" height="1" fill="#29adff"/>
+          <rect x="9" y="5" width="1" height="1" fill="#29adff"/>
+          <!-- mouth -->
+          <rect x="6" y="7" width="4" height="1" fill="#c96a4a"/>
+          <!-- body -->
+          <rect x="4" y="8" width="8" height="5" fill="#00e756"/>
+          <rect x="4" y="8" width="8" height="1" fill="#067a33"/>
+          <!-- arms -->
+          <rect x="2" y="9" width="2" height="3" fill="#f2c88f"/>
+          <rect x="12" y="9" width="2" height="3" fill="#f2c88f"/>
+          <!-- legs -->
+          <rect x="5" y="13" width="2" height="2" fill="#2b2b45"/>
+          <rect x="9" y="13" width="2" height="2" fill="#2b2b45"/>
+        </svg>
+      </div>
+      <div class="hero-info">
+        <h1>IPTUL</h1>
+        <span class="role px" id="typewriter"></span>
+        <div class="bar-row"><span>HP</span><div class="bar hp"><i></i></div><span>92/100</span></div>
+        <div class="bar-row"><span>MP</span><div class="bar mp"><i></i></div><span>78/100</span></div>
+        <div class="bar-row"><span>XP</span><div class="bar xp"><i></i></div><span>LV.22</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <h2 class="section-title px">CHARACTER INFO</h2>
+    <div class="sheet pixel-box">
+      <p>Halo! Saya <b style="color:var(--green)">Iptul</b> — seorang web developer yang suka
+      ngoding sambil nostalgia game retro. Misi utama saya: membangun website yang cepat,
+      rapi, dan menyenangkan dipakai. Side quest: eksplor teknologi baru dan open source.</p>
+      <p>Kalau tidak sedang push commit, biasanya saya sedang grinding skill baru
+      atau farming ide project di internet.</p>
+      <div class="stat-grid">
+        <div class="stat"><span>CLASS</span><b>WEB DEV</b></div>
+        <div class="stat"><span>GUILD</span><b>OPEN SOURCE</b></div>
+        <div class="stat"><span>BASE</span><b>INDONESIA</b></div>
+        <div class="stat"><span>WEAPON</span><b>KEYBOARD</b></div>
+        <div class="stat"><span>BUFF</span><b>KOPI ☕</b></div>
+        <div class="stat"><span>STATUS</span><b>OPEN TO WORK</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <h2 class="section-title px">SKILL TREE</h2>
+    <div class="sheet pixel-box">
+      <div class="skill" data-lv="90"><div class="label"><span>HTML / CSS</span><span class="lv">LV.90</span></div><div class="bar"><i></i></div></div>
+      <div class="skill" data-lv="82"><div class="label"><span>JAVASCRIPT</span><span class="lv">LV.82</span></div><div class="bar"><i></i></div></div>
+      <div class="skill" data-lv="70"><div class="label"><span>REACT / NEXT.JS</span><span class="lv">LV.70</span></div><div class="bar"><i></i></div></div>
+      <div class="skill" data-lv="65"><div class="label"><span>NODE.JS</span><span class="lv">LV.65</span></div><div class="bar"><i></i></div></div>
+      <div class="skill" data-lv="60"><div class="label"><span>GIT / GITHUB</span><span class="lv">LV.60</span></div><div class="bar"><i></i></div></div>
+      <div class="skill" data-lv="55"><div class="label"><span>UI / UX</span><span class="lv">LV.55</span></div><div class="bar"><i></i></div></div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="quests">
+    <h2 class="section-title px">QUEST LOG</h2>
+    <div class="quests">
+      <div class="quest pixel-box">
+        <span class="status done">CLEAR!</span>
+        <h3>PERSONAL WEBSITE</h3>
+        <div class="diff">★★☆☆☆</div>
+        <p>Website portofolio bertema pixel game (yang sedang kamu lihat sekarang). Dibangun tanpa framework — HTML, CSS, dan JS murni.</p>
+        <div class="tags"><span>HTML</span><span>CSS</span><span>JS</span></div>
+        <a href="https://github.com/kiptul/iptul.my.id" target="_blank" rel="noopener">▶ VIEW REPO</a>
+      </div>
+      <div class="quest pixel-box">
+        <span class="status">ON GOING</span>
+        <h3>PROJECT #2</h3>
+        <div class="diff">★★★☆☆</div>
+        <p>Slot quest berikutnya. Deskripsi project akan muncul di sini setelah quest dimulai. Stay tuned!</p>
+        <div class="tags"><span>SOON</span></div>
+        <a href="#contact">▶ REQUEST QUEST</a>
+      </div>
+      <div class="quest pixel-box">
+        <span class="status">LOCKED</span>
+        <h3>PROJECT #3</h3>
+        <div class="diff">★★★★★</div>
+        <p>??? — Quest rahasia. Butuh level lebih tinggi (atau kolaborasi!) untuk membuka quest ini.</p>
+        <div class="tags"><span>???</span></div>
+        <a href="#contact">▶ UNLOCK</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <h2 class="section-title px">FINAL STAGE</h2>
+    <div class="pixel-box">
+      <div class="gameover px">GAME OVER?</div>
+      <div class="continue">TIDAK! PETUALANGAN BARU DIMULAI. <span class="blink">CONTINUE?</span></div>
+      <div class="contact-links">
+        <a class="btn" href="mailto:zeindhikral@gmail.com">📧 EMAIL</a>
+        <a class="btn alt" href="https://github.com/kiptul" target="_blank" rel="noopener">🐙 GITHUB</a>
+        <a class="btn alt2" href="#" id="copy-email">📋 COPY EMAIL</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  © 2026 IPTUL.MY.ID · MADE WITH ❤ AND ☕<br>
+  HINT: COBA KODE KONAMI... ↑↑↓↓←→←→BA
+</footer>
+
+<script>
+  // ===== start screen =====
+  const startScreen = document.getElementById('start-screen');
+  function startGame() {
+    startScreen.classList.add('hidden');
+    document.removeEventListener('keydown', startGame);
+  }
+  document.getElementById('press-start').addEventListener('click', startGame);
+  document.addEventListener('keydown', startGame, { once: false });
+
+  // ===== stars =====
+  const stars = document.getElementById('stars');
+  for (let i = 0; i < 60; i++) {
+    const s = document.createElement('span');
+    s.style.left = Math.random() * 100 + 'vw';
+    s.style.top = Math.random() * 100 + 'vh';
+    s.style.animationDelay = (Math.random() * 2) + 's';
+    stars.appendChild(s);
+  }
+
+  // ===== typewriter =====
+  const roles = ['WEB DEVELOPER', 'PIXEL ART ENJOYER', 'BUG HUNTER', 'COFFEE POWERED'];
+  const tw = document.getElementById('typewriter');
+  let ri = 0, ci = 0, deleting = false;
+  (function type() {
+    const word = roles[ri];
+    tw.textContent = word.slice(0, ci);
+    if (!deleting && ci < word.length) { ci++; setTimeout(type, 90); }
+    else if (!deleting) { deleting = true; setTimeout(type, 1500); }
+    else if (ci > 0) { ci--; setTimeout(type, 40); }
+    else { deleting = false; ri = (ri + 1) % roles.length; setTimeout(type, 300); }
+  })();
+
+  // ===== skill bars animate on scroll =====
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelector('.bar i').style.width = e.target.dataset.lv + '%';
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: .4 });
+  document.querySelectorAll('.skill').forEach(el => observer.observe(el));
+
+  // ===== coins =====
+  let coins = 0;
+  const coinCount = document.getElementById('coin-count');
+  document.getElementById('coins').addEventListener('click', () => {
+    coins++;
+    coinCount.textContent = coins;
+    if (coins === 10) alert('🎉 ACHIEVEMENT UNLOCKED: COIN COLLECTOR!');
+  });
+
+  // ===== copy email =====
+  document.getElementById('copy-email').addEventListener('click', e => {
+    e.preventDefault();
+    navigator.clipboard.writeText('zeindhikral@gmail.com').then(() => {
+      e.target.textContent = '✅ COPIED!';
+      setTimeout(() => e.target.textContent = '📋 COPY EMAIL', 1500);
+    });
+  });
+
+  // ===== konami code =====
+  const konami = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  let ki = 0;
+  document.addEventListener('keydown', e => {
+    ki = (e.key === konami[ki]) ? ki + 1 : (e.key === konami[0] ? 1 : 0);
+    if (ki === konami.length) {
+      document.body.classList.toggle('rainbow');
+      coins += 30;
+      coinCount.textContent = coins;
+      ki = 0;
+    }
+  });
+</script>
+</body>
+</html>
