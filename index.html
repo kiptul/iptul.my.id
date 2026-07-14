@@ -2,9 +2,9 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>IPTUL.LONCAT — Pixel Portfolio</title>
-<meta name="description" content="Portofolio Iptul — web developer. Tema pixel game cerah dan friendly.">
+<meta name="description" content="Portofolio interaktif Iptul — jalan dan loncat melewati dunia pixel untuk menjelajahi skill, project, dan kontak.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
@@ -15,6 +15,8 @@
     --sky2: #c9ecff;
     --panel: #fffbee;
     --border: #5b4636;
+    --wood: #8a5a3b;
+    --wood-dark: #6b4229;
     --coral: #ff6b6b;
     --sun: #ffc93c;
     --leaf: #3ecf6e;
@@ -23,48 +25,49 @@
     --berry: #b06ef2;
     --ink: #3a2f28;
     --soft: #8a7a6b;
+    --ground-h: 110px;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  html, body { height: 100%; }
   body {
-    background: linear-gradient(180deg, var(--sky) 0%, var(--sky2) 100%) fixed;
+    background: linear-gradient(180deg, var(--sky) 0%, var(--sky2) 100%);
     color: var(--ink);
     font-family: 'VT323', monospace;
-    font-size: 22px;
-    line-height: 1.5;
+    font-size: 21px;
+    line-height: 1.45;
     image-rendering: pixelated;
-    overflow-x: hidden;
+    overflow: hidden;
+    touch-action: none;
+    -webkit-user-select: none; user-select: none;
   }
   h1, h2, h3, .px { font-family: 'Press Start 2P', monospace; }
 
-  /* scanline halus biar tetap kerasa retro */
   body::after {
     content: "";
     position: fixed; inset: 0;
     background: repeating-linear-gradient(0deg, rgba(0,0,0,.05) 0 1px, transparent 1px 3px);
-    pointer-events: none; z-index: 9998;
+    pointer-events: none; z-index: 9990;
   }
 
   .pixel-box {
     background: var(--panel);
     border: 4px solid var(--border);
     box-shadow: 0 0 0 4px #ffffff88, 8px 8px 0 0 rgba(59,42,28,.25);
-    position: relative;
   }
+  .blink { animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
 
-  /* ===== start screen ===== */
+  /* ================= START SCREEN ================= */
   #start-screen {
     position: fixed; inset: 0; z-index: 9999;
-    background: linear-gradient(180deg, var(--sky) 0%, var(--sky2) 70%, var(--leaf) 70%, var(--leaf) 100%);
+    background: linear-gradient(180deg, var(--sky) 0%, var(--sky2) 68%, var(--leaf) 68%, var(--leaf) 100%);
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 32px; text-align: center; padding: 20px;
+    gap: 30px; text-align: center; padding: 20px;
     transition: opacity .4s steps(6), visibility .4s;
   }
   #start-screen.hidden { opacity: 0; visibility: hidden; }
   #start-screen h1 { font-size: clamp(20px, 5.5vw, 44px); color: #fff; text-shadow: 4px 4px 0 var(--coral), 8px 8px 0 rgba(59,42,28,.25); }
-  #start-screen .sub { color: var(--border); font-size: clamp(10px, 2.5vw, 14px); }
-  .blink { animation: blink 1s steps(2) infinite; }
-  @keyframes blink { 50% { opacity: 0; } }
+  #start-screen .sub { color: var(--border); font-size: clamp(9px, 2.4vw, 13px); }
   #press-start {
     font-family: 'Press Start 2P', monospace;
     font-size: clamp(12px, 3vw, 18px);
@@ -74,150 +77,195 @@
   }
   #press-start:active { transform: translateY(4px); box-shadow: 0 2px 0 0 #c9962a; }
 
-  /* ===== matahari & awan ===== */
+  /* ================= HUD ================= */
+  #hud {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 10px 14px;
+    background: linear-gradient(180deg, rgba(255,251,238,.92), rgba(255,251,238,.75));
+    border-bottom: 4px solid var(--border);
+  }
+  #hud .logo { font-family: 'Press Start 2P', monospace; font-size: 11px; color: var(--coral); white-space: nowrap; }
+  #progress { flex: 1; max-width: 320px; height: 14px; border: 3px solid var(--border); background: #efe6d4; position: relative; }
+  #progress i { display: block; height: 100%; width: 0%; background: repeating-linear-gradient(90deg, var(--leaf) 0 8px, #6fe397 8px 16px); }
+  #progress .flag { position: absolute; right: -4px; top: -20px; font-size: 14px; }
+  #coins { font-family: 'Press Start 2P', monospace; font-size: 10px; color: #c9962a; white-space: nowrap; }
+
+  /* ================= GAME VIEWPORT ================= */
+  #viewport { position: fixed; inset: 0; overflow: hidden; }
+  .layer { position: absolute; inset: 0; will-change: transform; }
+
+  /* matahari fixed */
   #sun {
-    position: fixed; top: 26px; right: 34px; z-index: -1;
+    position: fixed; top: 64px; right: 34px; z-index: 1;
     width: 56px; height: 56px; background: var(--sun);
-    box-shadow: 0 0 0 8px #ffd96a66, -68px 0 0 -20px #ffffff00;
+    box-shadow: 0 0 0 8px #ffd96a66;
     animation: sunpulse 3s steps(3) infinite;
   }
   @keyframes sunpulse { 50% { box-shadow: 0 0 0 14px #ffd96a66; } }
-  .cloud {
-    position: fixed; z-index: -1;
-    height: 24px; background: #fff;
-    animation: drift linear infinite;
-  }
-  .cloud::before {
-    content: ""; position: absolute;
-    width: 24px; height: 16px; background: #fff;
-    top: -16px; left: 16px;
-  }
-  @keyframes drift {
-    from { transform: translateX(-140px); }
-    to   { transform: translateX(110vw); }
-  }
 
-  /* ===== nav ===== */
-  nav {
-    position: sticky; top: 0; z-index: 100;
-    background: var(--panel);
-    border-bottom: 4px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 20px; flex-wrap: wrap; gap: 10px;
-  }
-  nav .logo { font-family: 'Press Start 2P', monospace; font-size: 13px; color: var(--coral); text-decoration: none; }
-  nav .links { display: flex; gap: 6px; flex-wrap: wrap; }
-  nav .links a {
-    font-family: 'Press Start 2P', monospace; font-size: 9px;
-    color: var(--soft); text-decoration: none; padding: 8px 10px;
-    border: 2px solid transparent;
-  }
-  nav .links a:hover { color: var(--ocean); border-color: var(--ocean); background: #e8f6ff; }
-  #coins { font-family: 'Press Start 2P', monospace; font-size: 10px; color: #c9962a; cursor: pointer; user-select: none; }
+  .cloud { position: absolute; height: 24px; background: #fff; opacity: .85; }
+  .cloud::before { content: ""; position: absolute; width: 24px; height: 16px; background: #fff; top: -16px; left: 16px; }
 
-  main { max-width: 960px; margin: 0 auto; padding: 40px 20px 80px; }
-  section { margin-bottom: 72px; }
+  .hill { position: absolute; bottom: var(--ground-h); background: #a5e8b8; }
+  .hill.far { background: #c2f0cd; }
+  .tree { position: absolute; bottom: var(--ground-h); width: 16px; height: 46px; background: var(--wood); }
+  .tree::before { content: ""; position: absolute; width: 56px; height: 48px; left: -20px; top: -40px; background: var(--leaf); box-shadow: 0 -12px 0 -6px var(--leaf-dark) inset; }
+  .bush { position: absolute; bottom: var(--ground-h); width: 44px; height: 22px; background: var(--leaf); }
+  .bush::before { content: ""; position: absolute; width: 22px; height: 14px; top: -14px; left: 11px; background: var(--leaf); }
 
-  .section-title {
-    font-size: clamp(14px, 3.5vw, 20px);
-    color: var(--border); margin-bottom: 28px;
-    display: flex; align-items: center; gap: 12px;
-    text-shadow: 2px 2px 0 #ffffffaa;
-  }
-  .section-title::before { content: "▶"; color: var(--coral); animation: blink 1.2s steps(2) infinite; }
-
-  /* ===== hero ===== */
-  #hero { display: flex; gap: 36px; align-items: center; flex-wrap: wrap; padding: 28px; }
-  .avatar-frame { padding: 12px; background: #e8f6ff; border: 4px solid var(--ocean); flex-shrink: 0; }
-  #avatar { display: block; width: 128px; height: 128px; animation: loncat 1.2s steps(4) infinite; }
-  @keyframes loncat {
-    0%, 100% { transform: translateY(0); }
-    30% { transform: translateY(-14px); }
-    50% { transform: translateY(-18px); }
-    70% { transform: translateY(-8px); }
-  }
-  .hero-info { flex: 1; min-width: 260px; }
-  .hero-info h1 { font-size: clamp(16px, 4.5vw, 28px); color: var(--coral); margin-bottom: 10px; text-shadow: 3px 3px 0 #ffd0d0; }
-  .hero-info .role { color: var(--ocean); font-size: clamp(10px, 2.5vw, 13px); min-height: 1.6em; display: block; margin-bottom: 18px; font-family: 'Press Start 2P', monospace; }
-  .hero-info .role::after { content: "█"; animation: blink .8s steps(2) infinite; }
-  .bar-row { display: grid; grid-template-columns: 42px 1fr 64px; align-items: center; gap: 10px; margin-bottom: 10px; font-family: 'Press Start 2P', monospace; font-size: 10px; }
-  .bar { height: 18px; background: #efe6d4; border: 3px solid var(--border); }
-  .bar i { display: block; height: 100%; }
-  .hp i { background: repeating-linear-gradient(90deg, var(--coral) 0 8px, #ff8f8f 8px 16px); width: 92%; }
-  .mp i { background: repeating-linear-gradient(90deg, var(--ocean) 0 8px, #6cc4ff 8px 16px); width: 78%; }
-  .xp i { background: repeating-linear-gradient(90deg, var(--sun) 0 8px, #ffde79 8px 16px); width: 64%; animation: xpfill 3s steps(12) both; }
-  @keyframes xpfill { from { width: 0; } }
-
-  /* ===== about ===== */
-  .sheet { padding: 24px; }
-  .sheet p { margin-bottom: 14px; }
-  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 20px; }
-  .stat { background: #fff; border: 3px solid var(--border); padding: 12px 14px; display: flex; justify-content: space-between; font-family: 'Press Start 2P', monospace; font-size: 9px; }
-  .stat b { color: var(--leaf-dark); }
-
-  /* ===== skills ===== */
-  .skill { margin-bottom: 20px; }
-  .skill .label { display: flex; justify-content: space-between; font-family: 'Press Start 2P', monospace; font-size: 10px; margin-bottom: 6px; }
-  .skill .label .lv { color: var(--berry); }
-  .skill .bar { height: 22px; }
-  .skill .bar i { background: repeating-linear-gradient(90deg, var(--leaf) 0 10px, #6fe397 10px 20px); width: 0; transition: width 1.4s steps(14); }
-
-  /* ===== quests ===== */
-  .quests { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 24px; }
-  .quest { padding: 20px; display: flex; flex-direction: column; gap: 10px; transition: transform .1s steps(2); }
-  .quest:hover { transform: translate(-4px, -4px); border-color: var(--ocean); }
-  .quest h3 { font-size: 11px; color: var(--ocean); line-height: 1.8; }
-  .quest .diff { color: #e0a41a; letter-spacing: 3px; font-size: 18px; }
-  .quest p { color: var(--soft); font-size: 19px; flex: 1; }
-  .quest .tags { display: flex; gap: 6px; flex-wrap: wrap; }
-  .quest .tags span { font-family: 'Press Start 2P', monospace; font-size: 8px; color: #fff; background: var(--leaf-dark); padding: 4px 6px; }
-  .quest a {
-    font-family: 'Press Start 2P', monospace; font-size: 9px;
-    color: var(--coral); text-decoration: none; align-self: flex-start;
-  }
-  .quest a:hover { color: var(--leaf-dark); }
-  .quest .status { position: absolute; top: -14px; right: 10px; font-family: 'Press Start 2P', monospace; font-size: 8px; padding: 4px 8px; background: var(--coral); color: #fff; }
-  .quest .status.done { background: var(--leaf); color: #fff; }
-
-  /* ===== contact ===== */
-  #contact .pixel-box { padding: 32px; text-align: center; }
-  #contact .gameover { font-size: clamp(16px, 4vw, 26px); color: var(--berry); text-shadow: 3px 3px 0 #e3ccff; margin-bottom: 10px; }
-  #contact .continue { font-family: 'Press Start 2P', monospace; font-size: 11px; margin-bottom: 26px; }
-  .contact-links { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-  .btn {
-    font-family: 'Press Start 2P', monospace; font-size: 10px;
-    color: #fff; background: var(--coral); text-decoration: none;
-    padding: 14px 18px; border: none; cursor: pointer;
-    box-shadow: 0 6px 0 0 #c94a4a; display: inline-block;
-  }
-  .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 0 #c94a4a; }
-  .btn.alt { background: var(--ocean); box-shadow: 0 6px 0 0 #1f7cb8; }
-  .btn.alt:active { box-shadow: 0 2px 0 0 #1f7cb8; }
-  .btn.alt2 { background: var(--sun); color: var(--ink); box-shadow: 0 6px 0 0 #c9962a; }
-  .btn.alt2:active { box-shadow: 0 2px 0 0 #c9962a; }
-
-  /* ===== footer rumput ===== */
-  footer {
-    text-align: center; padding: 32px 24px 24px;
+  #ground {
+    position: absolute; left: 0; bottom: 0; height: var(--ground-h);
     background: var(--leaf);
     border-top: 8px solid var(--leaf-dark);
-    font-family: 'Press Start 2P', monospace;
-    font-size: 8px; color: #fff; line-height: 2.2;
-    position: relative;
   }
-  footer::before {
+  #ground::before {
     content: ""; position: absolute; top: -20px; left: 0; right: 0; height: 12px;
     background: repeating-linear-gradient(90deg, var(--leaf-dark) 0 12px, transparent 12px 24px);
   }
+  #ground::after {
+    content: ""; position: absolute; top: 26px; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(90deg, #b98a52 0 26px, #a87944 26px 52px);
+  }
+
+  /* ================= PAPAN KONTEN ================= */
+  .board {
+    position: absolute; bottom: calc(var(--ground-h) + 46px);
+    padding: 16px 18px;
+    width: max-content;
+    max-width: min(430px, 86vw);
+    max-height: calc(100vh - var(--ground-h) - 130px);
+    overflow-y: auto;
+    -webkit-user-select: text; user-select: text;
+  }
+  .board::after {
+    content: ""; position: absolute; left: 50%; bottom: -50px; transform: translateX(-50%);
+    width: 14px; height: 50px; background: var(--wood);
+    box-shadow: 4px 0 0 0 var(--wood-dark);
+  }
+  .board h2 { font-size: 12px; color: var(--border); margin-bottom: 12px; }
+  .board h2::before { content: "▶ "; color: var(--coral); }
+  .board p { margin-bottom: 10px; }
+
+  .sign { /* papan kecil penunjuk arah */
+    position: absolute; bottom: calc(var(--ground-h) + 40px);
+    background: var(--wood); color: #ffe9c9;
+    font-family: 'Press Start 2P', monospace; font-size: 9px;
+    padding: 10px 12px; border: 4px solid var(--wood-dark);
+    white-space: nowrap;
+  }
+  .sign::after {
+    content: ""; position: absolute; left: 50%; bottom: -44px; transform: translateX(-50%);
+    width: 12px; height: 44px; background: var(--wood);
+    box-shadow: 3px 0 0 0 var(--wood-dark);
+  }
+
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .stat { background: #fff; border: 3px solid var(--border); padding: 8px 10px; display: flex; justify-content: space-between; gap: 10px; font-family: 'Press Start 2P', monospace; font-size: 8px; }
+  .stat b { color: var(--leaf-dark); }
+
+  .skill { margin-bottom: 12px; min-width: 300px; }
+  .skill .label { display: flex; justify-content: space-between; font-family: 'Press Start 2P', monospace; font-size: 9px; margin-bottom: 5px; }
+  .skill .label .lv { color: var(--berry); }
+  .skill .bar { height: 18px; background: #efe6d4; border: 3px solid var(--border); }
+  .skill .bar i { display: block; height: 100%; width: 0; background: repeating-linear-gradient(90deg, var(--leaf) 0 10px, #6fe397 10px 20px); transition: width 1.2s steps(12); }
+
+  .quest { width: 300px; }
+  .quest .status { position: absolute; top: -14px; right: 10px; font-family: 'Press Start 2P', monospace; font-size: 8px; padding: 4px 8px; background: var(--coral); color: #fff; }
+  .quest .status.done { background: var(--leaf); }
+  .quest h3 { font-size: 10px; color: var(--ocean); line-height: 1.8; margin-bottom: 6px; }
+  .quest .diff { color: #e0a41a; letter-spacing: 3px; font-size: 17px; margin-bottom: 6px; }
+  .quest p { color: var(--soft); font-size: 18px; }
+  .quest .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .quest .tags span { font-family: 'Press Start 2P', monospace; font-size: 7px; color: #fff; background: var(--leaf-dark); padding: 3px 5px; }
+  .quest a { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--coral); text-decoration: none; }
+
+  .contact-links { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
+  .btn {
+    font-family: 'Press Start 2P', monospace; font-size: 9px;
+    color: #fff; background: var(--coral); text-decoration: none;
+    padding: 12px 14px; border: none; cursor: pointer;
+    box-shadow: 0 5px 0 0 #c94a4a; display: inline-block;
+  }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 0 #c94a4a; }
+  .btn.alt { background: var(--ocean); box-shadow: 0 5px 0 0 #1f7cb8; }
+  .btn.alt:active { box-shadow: 0 1px 0 0 #1f7cb8; }
+  .btn.alt2 { background: var(--sun); color: var(--ink); box-shadow: 0 5px 0 0 #c9962a; }
+  .btn.alt2:active { box-shadow: 0 1px 0 0 #c9962a; }
+
+  /* bendera finish */
+  #flag { position: absolute; bottom: var(--ground-h); width: 12px; height: 150px; background: var(--border); }
+  #flag::before {
+    content: ""; position: absolute; top: 0; left: 12px;
+    border-top: 26px solid var(--coral); border-bottom: 26px solid transparent; border-left: 44px solid var(--coral);
+    animation: wave 1s steps(2) infinite;
+  }
+  @keyframes wave { 50% { transform: scaleY(.85); } }
+
+  /* ================= KOIN ================= */
+  .coin {
+    position: absolute; width: 26px; height: 26px;
+    background: var(--sun); border: 3px solid #c9962a;
+    border-radius: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Press Start 2P', monospace; font-size: 10px; color: #a8791b;
+    animation: coinspin 1s steps(4) infinite;
+  }
+  @keyframes coinspin { 50% { transform: scaleX(.3); } }
+  .coin.got { display: none; }
+
+  /* ================= KARAKTER ================= */
+  #char {
+    position: absolute; bottom: var(--ground-h);
+    width: 96px; height: 96px;
+    will-change: transform;
+  }
+  #char svg { width: 100%; height: 100%; display: block; }
+  #char .legB { visibility: hidden; }
+  #char.f1 .legA { visibility: hidden; }
+  #char.f1 .legB { visibility: visible; }
+  #char.face-left svg { transform: scaleX(-1); }
+  #char .shadow {
+    position: absolute; left: 24px; bottom: -8px; width: 48px; height: 8px;
+    background: rgba(59,42,28,.2);
+  }
+
+  /* ================= KONTROL SENTUH ================= */
+  #touch-controls { position: fixed; left: 0; right: 0; bottom: 14px; z-index: 600; display: none; justify-content: space-between; padding: 0 16px; pointer-events: none; }
+  #touch-controls .group { display: flex; gap: 12px; pointer-events: auto; }
+  .tbtn {
+    width: 62px; height: 62px;
+    font-family: 'Press Start 2P', monospace; font-size: 18px;
+    background: rgba(255,251,238,.85); color: var(--ink);
+    border: 4px solid var(--border); box-shadow: 0 5px 0 0 rgba(59,42,28,.4);
+    touch-action: none;
+  }
+  .tbtn:active { transform: translateY(3px); box-shadow: 0 2px 0 0 rgba(59,42,28,.4); }
+  #btn-jump { background: var(--sun); }
+  @media (hover: none) and (pointer: coarse) { #touch-controls { display: flex; } }
+
+  #hint {
+    position: fixed; left: 50%; transform: translateX(-50%);
+    bottom: calc(var(--ground-h) + 210px); z-index: 400;
+    font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--border);
+    background: rgba(255,251,238,.9); border: 3px solid var(--border); padding: 10px 12px;
+    transition: opacity .6s steps(6); text-align: center; line-height: 2;
+  }
+  #hint.hidden { opacity: 0; }
 
   body.rainbow { animation: hue 3s linear infinite; }
   @keyframes hue { to { filter: hue-rotate(360deg); } }
 
+  noscript .board { position: static; max-width: 500px; margin: 80px auto; }
+
   @media (max-width: 560px) {
-    body { font-size: 19px; }
-    #hero { justify-content: center; text-align: center; }
-    .bar-row { text-align: left; }
-    #sun { top: 84px; }
+    body { font-size: 18px; }
+    #hud .logo { font-size: 9px; }
+    #progress { max-width: 130px; }
+    #char { width: 78px; height: 78px; }
+    #char .shadow { left: 19px; width: 40px; }
+    .skill { min-width: 220px; }
+    #sun { top: 58px; right: 16px; width: 42px; height: 42px; }
   }
 </style>
 </head>
@@ -226,80 +274,43 @@
 <!-- START SCREEN -->
 <div id="start-screen">
   <h1>IPTUL.LONCAT</h1>
-  <div class="sub px">— PIXEL PORTFOLIO v2.0 —</div>
+  <div class="sub px">— PIXEL PORTFOLIO v3.0 · WORLD 1-1 —</div>
   <button id="press-start" class="blink">▶ PRESS START ◀</button>
   <div class="sub px" style="font-size:8px;">© 2026 IPTUL GAMES · INSERT COIN</div>
 </div>
 
+<!-- HUD -->
+<div id="hud">
+  <span class="logo">IPTUL.LONCAT</span>
+  <div id="progress"><i></i><span class="flag">🏁</span></div>
+  <span id="coins">🪙 <span id="coin-count">0</span></span>
+</div>
+
 <div id="sun"></div>
 
-<nav>
-  <a class="logo" href="#">IPTUL.LONCAT</a>
-  <div class="links">
-    <a href="#about">ABOUT</a>
-    <a href="#skills">SKILLS</a>
-    <a href="#quests">QUESTS</a>
-    <a href="#contact">CONTACT</a>
-  </div>
-  <div id="coins" title="klik untuk koin!">🪙 <span id="coin-count">0</span></div>
-</nav>
+<!-- DUNIA -->
+<div id="viewport">
+  <div class="layer" id="layer-clouds"></div>
+  <div class="layer" id="layer-deco"></div>
+  <div class="layer" id="layer-main">
+    <div id="ground"></div>
 
-<main>
-
-  <!-- HERO -->
-  <section>
-    <div id="hero" class="pixel-box">
-      <div class="avatar-frame">
-        <svg id="avatar" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-          <rect width="16" height="16" fill="#e8f6ff"/>
-          <!-- rambut -->
-          <rect x="4" y="1" width="8" height="2" fill="#5b4636"/>
-          <rect x="3" y="2" width="2" height="3" fill="#5b4636"/>
-          <rect x="11" y="2" width="2" height="3" fill="#5b4636"/>
-          <!-- wajah -->
-          <rect x="4" y="3" width="8" height="5" fill="#ffd9a8"/>
-          <!-- mata -->
-          <rect x="5" y="5" width="2" height="2" fill="#3a2f28"/>
-          <rect x="9" y="5" width="2" height="2" fill="#3a2f28"/>
-          <rect x="5" y="5" width="1" height="1" fill="#2fa8f5"/>
-          <rect x="9" y="5" width="1" height="1" fill="#2fa8f5"/>
-          <!-- pipi merona -->
-          <rect x="4" y="6" width="1" height="1" fill="#ffab91"/>
-          <rect x="11" y="6" width="1" height="1" fill="#ffab91"/>
-          <!-- senyum -->
-          <rect x="6" y="7" width="1" height="1" fill="#c96a4a"/>
-          <rect x="7" y="7" width="2" height="1" fill="#e0855f"/>
-          <rect x="9" y="7" width="1" height="1" fill="#c96a4a"/>
-          <!-- badan -->
-          <rect x="4" y="8" width="8" height="5" fill="#ff6b6b"/>
-          <rect x="4" y="8" width="8" height="1" fill="#c94a4a"/>
-          <!-- tangan -->
-          <rect x="2" y="9" width="2" height="3" fill="#ffd9a8"/>
-          <rect x="12" y="9" width="2" height="3" fill="#ffd9a8"/>
-          <!-- kaki -->
-          <rect x="5" y="13" width="2" height="2" fill="#5b4636"/>
-          <rect x="9" y="13" width="2" height="2" fill="#5b4636"/>
-        </svg>
-      </div>
-      <div class="hero-info">
-        <h1>IPTUL.LONCAT</h1>
-        <span class="role" id="typewriter"></span>
-        <div class="bar-row"><span>HP</span><div class="bar hp"><i></i></div><span>92/100</span></div>
-        <div class="bar-row"><span>MP</span><div class="bar mp"><i></i></div><span>78/100</span></div>
-        <div class="bar-row"><span>XP</span><div class="bar xp"><i></i></div><span>LV.22</span></div>
-      </div>
+    <!-- papan judul -->
+    <div class="board pixel-box" style="left:240px;">
+      <h2>IPTUL.LONCAT</h2>
+      <p>Selamat datang di portofolio interaktif <b style="color:var(--coral)">Iptul</b>!<br>
+      Jalan ke kanan untuk menjelajah. 🐸</p>
+      <p class="px" style="font-size:9px; line-height:2;" id="ctrl-hint">→ JALAN &nbsp;·&nbsp; SPASI LONCAT</p>
     </div>
-  </section>
 
-  <!-- ABOUT -->
-  <section id="about">
-    <h2 class="section-title px">CHARACTER INFO</h2>
-    <div class="sheet pixel-box">
-      <p>Halo! Saya <b style="color:var(--coral)">Iptul</b> — seorang web developer yang suka
-      ngoding sambil nostalgia game retro. Misi utama saya: membangun website yang cepat,
-      rapi, dan menyenangkan dipakai. Side quest: eksplor teknologi baru dan open source.</p>
-      <p>Kalau tidak sedang push commit, biasanya saya sedang grinding skill baru
-      atau farming ide project di internet. Dan iya, karakternya loncat-loncat terus. 🐸</p>
+    <div class="sign" style="left:900px;">ABOUT →</div>
+
+    <!-- character info -->
+    <div class="board pixel-box" style="left:1150px;">
+      <h2>CHARACTER INFO</h2>
+      <p>Halo! Saya <b style="color:var(--coral)">Iptul</b> — web developer yang suka ngoding
+      sambil nostalgia game retro. Misi: bikin website yang cepat, rapi, dan
+      menyenangkan dipakai.</p>
       <div class="stat-grid">
         <div class="stat"><span>CLASS</span><b>WEB DEV</b></div>
         <div class="stat"><span>GUILD</span><b>OPEN SOURCE</b></div>
@@ -309,12 +320,12 @@
         <div class="stat"><span>STATUS</span><b>OPEN TO WORK</b></div>
       </div>
     </div>
-  </section>
 
-  <!-- SKILLS -->
-  <section id="skills">
-    <h2 class="section-title px">SKILL TREE</h2>
-    <div class="sheet pixel-box">
+    <div class="sign" style="left:2150px;">SKILL TREE →</div>
+
+    <!-- skills -->
+    <div class="board pixel-box" id="skills-board" style="left:2450px;">
+      <h2>SKILL TREE</h2>
       <div class="skill" data-lv="90"><div class="label"><span>HTML / CSS</span><span class="lv">LV.90</span></div><div class="bar"><i></i></div></div>
       <div class="skill" data-lv="82"><div class="label"><span>JAVASCRIPT</span><span class="lv">LV.82</span></div><div class="bar"><i></i></div></div>
       <div class="skill" data-lv="70"><div class="label"><span>REACT / NEXT.JS</span><span class="lv">LV.70</span></div><div class="bar"><i></i></div></div>
@@ -322,137 +333,352 @@
       <div class="skill" data-lv="60"><div class="label"><span>GIT / GITHUB</span><span class="lv">LV.60</span></div><div class="bar"><i></i></div></div>
       <div class="skill" data-lv="55"><div class="label"><span>UI / UX</span><span class="lv">LV.55</span></div><div class="bar"><i></i></div></div>
     </div>
-  </section>
 
-  <!-- PROJECTS -->
-  <section id="quests">
-    <h2 class="section-title px">QUEST LOG</h2>
-    <div class="quests">
-      <div class="quest pixel-box">
-        <span class="status done">CLEAR!</span>
-        <h3>PERSONAL WEBSITE</h3>
-        <div class="diff">★★☆☆☆</div>
-        <p>Website portofolio bertema pixel game (yang sedang kamu lihat sekarang). Dibangun tanpa framework — HTML, CSS, dan JS murni.</p>
-        <div class="tags"><span>HTML</span><span>CSS</span><span>JS</span></div>
-        <a href="https://github.com/kiptul/iptul.my.id" target="_blank" rel="noopener">▶ VIEW REPO</a>
-      </div>
-      <div class="quest pixel-box">
-        <span class="status">ON GOING</span>
-        <h3>PROJECT #2</h3>
-        <div class="diff">★★★☆☆</div>
-        <p>Slot quest berikutnya. Deskripsi project akan muncul di sini setelah quest dimulai. Stay tuned!</p>
-        <div class="tags"><span>SOON</span></div>
-        <a href="#contact">▶ REQUEST QUEST</a>
-      </div>
-      <div class="quest pixel-box">
-        <span class="status">LOCKED</span>
-        <h3>PROJECT #3</h3>
-        <div class="diff">★★★★★</div>
-        <p>??? — Quest rahasia. Butuh level lebih tinggi (atau kolaborasi!) untuk membuka quest ini.</p>
-        <div class="tags"><span>???</span></div>
-        <a href="#contact">▶ UNLOCK</a>
-      </div>
+    <div class="sign" style="left:3450px;">QUEST LOG →</div>
+
+    <!-- quests -->
+    <div class="board pixel-box quest" style="left:3750px;">
+      <span class="status done">CLEAR!</span>
+      <h3>PERSONAL WEBSITE</h3>
+      <div class="diff">★★☆☆☆</div>
+      <p>Portofolio side-scroller pixel yang sedang kamu mainkan. HTML, CSS, JS murni — tanpa framework.</p>
+      <div class="tags"><span>HTML</span><span>CSS</span><span>JS</span></div>
+      <a href="https://github.com/kiptul/iptul.my.id" target="_blank" rel="noopener">▶ VIEW REPO</a>
     </div>
-  </section>
+    <div class="board pixel-box quest" style="left:4160px;">
+      <span class="status">ON GOING</span>
+      <h3>PROJECT #2</h3>
+      <div class="diff">★★★☆☆</div>
+      <p>Slot quest berikutnya. Deskripsi project akan muncul setelah quest dimulai. Stay tuned!</p>
+      <div class="tags"><span>SOON</span></div>
+    </div>
+    <div class="board pixel-box quest" style="left:4570px;">
+      <span class="status">LOCKED</span>
+      <h3>PROJECT #3</h3>
+      <div class="diff">★★★★★</div>
+      <p>??? — Quest rahasia. Butuh level lebih tinggi (atau kolaborasi!) untuk membukanya.</p>
+      <div class="tags"><span>???</span></div>
+    </div>
 
-  <!-- CONTACT -->
-  <section id="contact">
-    <h2 class="section-title px">FINAL STAGE</h2>
-    <div class="pixel-box">
-      <div class="gameover px">NEW GAME+?</div>
-      <div class="continue">PETUALANGAN BARU MENANTI. <span class="blink">CONTINUE?</span></div>
+    <div class="sign" style="left:5250px;">FINAL STAGE →</div>
+
+    <!-- final -->
+    <div class="board pixel-box" style="left:5550px;">
+      <h2>NEW GAME+?</h2>
+      <p>Kamu sudah sampai garis finish! 🎉<br>Petualangan baru menanti — ayo kolaborasi.</p>
       <div class="contact-links">
         <a class="btn" href="mailto:zeindhikral@gmail.com">📧 EMAIL</a>
         <a class="btn alt" href="https://github.com/kiptul" target="_blank" rel="noopener">🐙 GITHUB</a>
-        <a class="btn alt2" href="#" id="copy-email">📋 COPY EMAIL</a>
+        <a class="btn alt2" href="#" id="copy-email">📋 COPY</a>
       </div>
     </div>
-  </section>
 
-</main>
+    <div id="flag" style="left:6150px;"></div>
 
-<footer>
-  © 2026 IPTUL.MY.ID · MADE WITH ❤ AND ☕<br>
-  HINT: COBA KODE KONAMI... ↑↑↓↓←→←→BA
-</footer>
+    <!-- karakter -->
+    <div id="char">
+      <div class="shadow"></div>
+      <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <!-- rambut -->
+        <rect x="4" y="1" width="8" height="2" fill="#5b4636"/>
+        <rect x="3" y="2" width="2" height="3" fill="#5b4636"/>
+        <rect x="11" y="2" width="2" height="3" fill="#5b4636"/>
+        <!-- wajah -->
+        <rect x="4" y="3" width="8" height="5" fill="#ffd9a8"/>
+        <!-- mata -->
+        <rect x="5" y="5" width="2" height="2" fill="#3a2f28"/>
+        <rect x="9" y="5" width="2" height="2" fill="#3a2f28"/>
+        <rect x="5" y="5" width="1" height="1" fill="#2fa8f5"/>
+        <rect x="9" y="5" width="1" height="1" fill="#2fa8f5"/>
+        <!-- pipi -->
+        <rect x="4" y="6" width="1" height="1" fill="#ffab91"/>
+        <rect x="11" y="6" width="1" height="1" fill="#ffab91"/>
+        <!-- senyum -->
+        <rect x="6" y="7" width="1" height="1" fill="#c96a4a"/>
+        <rect x="7" y="7" width="2" height="1" fill="#e0855f"/>
+        <rect x="9" y="7" width="1" height="1" fill="#c96a4a"/>
+        <!-- badan -->
+        <rect x="4" y="8" width="8" height="5" fill="#ff6b6b"/>
+        <rect x="4" y="8" width="8" height="1" fill="#c94a4a"/>
+        <!-- tangan -->
+        <rect x="2" y="9" width="2" height="3" fill="#ffd9a8"/>
+        <rect x="12" y="9" width="2" height="3" fill="#ffd9a8"/>
+        <!-- kaki frame A (diam) -->
+        <g class="legA">
+          <rect x="5" y="13" width="2" height="2" fill="#5b4636"/>
+          <rect x="9" y="13" width="2" height="2" fill="#5b4636"/>
+        </g>
+        <!-- kaki frame B (melangkah) -->
+        <g class="legB">
+          <rect x="3" y="13" width="2" height="2" fill="#5b4636"/>
+          <rect x="11" y="13" width="2" height="2" fill="#5b4636"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- petunjuk -->
+<div id="hint" class="hidden px"></div>
+
+<!-- kontrol sentuh -->
+<div id="touch-controls">
+  <div class="group">
+    <button class="tbtn" id="btn-left">◀</button>
+    <button class="tbtn" id="btn-right">▶</button>
+  </div>
+  <div class="group">
+    <button class="tbtn" id="btn-jump">Ⓐ</button>
+  </div>
+</div>
+
+<noscript>
+  <div class="board pixel-box">
+    <h2>IPTUL.LONCAT</h2>
+    <p>Portofolio interaktif ini butuh JavaScript. Kontak: <a href="mailto:zeindhikral@gmail.com">zeindhikral@gmail.com</a> · <a href="https://github.com/kiptul">github.com/kiptul</a></p>
+  </div>
+</noscript>
 
 <script>
-  // ===== start screen =====
-  const startScreen = document.getElementById('start-screen');
-  function startGame() {
-    startScreen.classList.add('hidden');
-    document.removeEventListener('keydown', startGame);
-  }
-  document.getElementById('press-start').addEventListener('click', startGame);
-  document.addEventListener('keydown', startGame, { once: false });
+  // ================= konstanta dunia =================
+  const WORLD_W = 6400;
+  const CHAR_W = () => charEl.offsetWidth;
+  const SPEED = 300;        // px/detik
+  const GRAVITY = 1900;     // px/detik^2
+  const JUMP_V = 720;       // px/detik
 
-  // ===== awan pixel =====
-  for (let i = 0; i < 6; i++) {
-    const c = document.createElement('div');
-    c.className = 'cloud';
-    const w = 60 + Math.random() * 60;
-    c.style.width = w + 'px';
-    c.style.top = (5 + Math.random() * 40) + 'vh';
-    c.style.opacity = .6 + Math.random() * .4;
-    c.style.animationDuration = (40 + Math.random() * 50) + 's';
-    c.style.animationDelay = (-Math.random() * 60) + 's';
-    document.body.appendChild(c);
-  }
+  const charEl = document.getElementById('char');
+  const layerMain = document.getElementById('layer-main');
+  const layerDeco = document.getElementById('layer-deco');
+  const layerClouds = document.getElementById('layer-clouds');
+  const progressFill = document.querySelector('#progress i');
+  const coinCount = document.getElementById('coin-count');
+  const hint = document.getElementById('hint');
 
-  // ===== typewriter =====
-  const roles = ['WEB DEVELOPER', 'PIXEL ART ENJOYER', 'BUG HUNTER', 'PRO JUMPER 🐸'];
-  const tw = document.getElementById('typewriter');
-  let ri = 0, ci = 0, deleting = false;
-  (function type() {
-    const word = roles[ri];
-    tw.textContent = word.slice(0, ci);
-    if (!deleting && ci < word.length) { ci++; setTimeout(type, 90); }
-    else if (!deleting) { deleting = true; setTimeout(type, 1500); }
-    else if (ci > 0) { ci--; setTimeout(type, 40); }
-    else { deleting = false; ri = (ri + 1) % roles.length; setTimeout(type, 300); }
+  document.getElementById('ground').style.width = WORLD_W + 'px';
+
+  // ================= dekorasi & awan (dibangun sekali) =================
+  (function buildScenery() {
+    // bukit & pohon di layer deco (parallax 0.6x) — sebar sepanjang dunia
+    for (let x = 100; x < WORLD_W * 0.6 + innerWidth; x += 420) {
+      const far = Math.random() > .5;
+      const h = document.createElement('div');
+      h.className = 'hill' + (far ? ' far' : '');
+      h.style.left = x + 'px';
+      h.style.width = (160 + Math.random() * 160) + 'px';
+      h.style.height = (30 + Math.random() * 50) + 'px';
+      layerDeco.appendChild(h);
+      if (Math.random() > .4) {
+        const t = document.createElement('div');
+        t.className = Math.random() > .5 ? 'tree' : 'bush';
+        t.style.left = (x + 60 + Math.random() * 120) + 'px';
+        layerDeco.appendChild(t);
+      }
+    }
+    // awan di layer clouds (parallax 0.3x)
+    for (let i = 0; i < 14; i++) {
+      const c = document.createElement('div');
+      c.className = 'cloud';
+      c.style.left = (Math.random() * (WORLD_W * 0.3 + innerWidth)) + 'px';
+      c.style.top = (40 + Math.random() * 30) + '%';
+      c.style.width = (56 + Math.random() * 60) + 'px';
+      c.style.top = (8 + Math.random() * 32) + 'vh';
+      layerClouds.appendChild(c);
+    }
   })();
 
-  // ===== skill bars =====
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.querySelector('.bar i').style.width = e.target.dataset.lv + '%';
-        observer.unobserve(e.target);
-      }
-    });
-  }, { threshold: .4 });
-  document.querySelectorAll('.skill').forEach(el => observer.observe(el));
-
-  // ===== coins =====
-  let coins = 0;
-  const coinCount = document.getElementById('coin-count');
-  document.getElementById('coins').addEventListener('click', () => {
-    coins++;
-    coinCount.textContent = coins;
-    if (coins === 10) alert('🎉 ACHIEVEMENT UNLOCKED: COIN COLLECTOR!');
+  // ================= koin =================
+  const coinSpots = [
+    [760, 0], [830, 0], [1650, 60], [1730, 90], [1810, 60],
+    [2260, 0], [3050, 0], [3130, 60], [3210, 0],
+    [3560, 90], [5000, 0], [5080, 60], [5160, 90], [5240, 60], [5400, 0]
+  ];
+  const coinEls = coinSpots.map(([x, y]) => {
+    const el = document.createElement('div');
+    el.className = 'coin';
+    el.textContent = '$';
+    el.style.left = x + 'px';
+    el.style.bottom = 'calc(var(--ground-h) + ' + y + 'px)';
+    el.dataset.x = x; el.dataset.y = y;
+    layerMain.appendChild(el);
+    return el;
   });
 
-  // ===== copy email =====
+  let coins = 0;
+  function addCoins(n) {
+    coins += n;
+    coinCount.textContent = coins;
+    if (coins >= 10 && !addCoins.badge) {
+      addCoins.badge = true;
+      showHint('🎉 ACHIEVEMENT: COIN COLLECTOR!', 2500);
+    }
+  }
+
+  // ================= state =================
+  let worldX = 140;         // posisi karakter di dunia
+  let y = 0, vy = 0;        // tinggi loncatan
+  let onGround = true;
+  let facing = 1;           // 1 kanan, -1 kiri
+  let keys = { left: false, right: false };
+  let running = false;
+  let skillsFilled = false;
+  let finishShown = false;
+
+  // ================= kontrol =================
+  const startScreen = document.getElementById('start-screen');
+  function startGame() {
+    if (running) return;
+    running = true;
+    startScreen.classList.add('hidden');
+    const touch = matchMedia('(hover: none) and (pointer: coarse)').matches;
+    document.getElementById('ctrl-hint').innerHTML = touch
+      ? '▶ JALAN &nbsp;·&nbsp; Ⓐ LONCAT'
+      : '→ JALAN &nbsp;·&nbsp; SPASI LONCAT';
+    requestAnimationFrame(loop);
+  }
+  document.getElementById('press-start').addEventListener('click', startGame);
+
+  function jump() {
+    if (onGround) { vy = JUMP_V; onGround = false; }
+  }
+
+  document.addEventListener('keydown', e => {
+    if (!running) { startGame(); return; }
+    if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
+    if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
+    if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') { e.preventDefault(); jump(); }
+    if ([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) e.preventDefault();
+    konami(e.key);
+  });
+  document.addEventListener('keyup', e => {
+    if (e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
+    if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
+  });
+
+  // tombol sentuh
+  function bindHold(id, on, off) {
+    const el = document.getElementById(id);
+    ['pointerdown', 'touchstart'].forEach(ev => el.addEventListener(ev, e => { e.preventDefault(); on(); }, { passive: false }));
+    ['pointerup', 'pointercancel', 'touchend', 'touchcancel', 'pointerleave'].forEach(ev => el.addEventListener(ev, e => { e.preventDefault(); off && off(); }, { passive: false }));
+  }
+  bindHold('btn-right', () => { keys.right = true; if (!running) startGame(); }, () => keys.right = false);
+  bindHold('btn-left', () => { keys.left = true; }, () => keys.left = false);
+  bindHold('btn-jump', () => { if (!running) startGame(); jump(); });
+
+  // scroll wheel & swipe = jalan juga (buat pengunjung yang nggak nyadar kontrol)
+  addEventListener('wheel', e => {
+    if (!running) return;
+    worldX += (e.deltaY + e.deltaX) * 0.6;
+    facing = (e.deltaY + e.deltaX) >= 0 ? 1 : -1;
+  }, { passive: true });
+
+  let dragX = null;
+  addEventListener('touchstart', e => {
+    if (e.target.closest('.tbtn, a, button, .board')) return;
+    dragX = e.touches[0].clientX;
+  }, { passive: true });
+  addEventListener('touchmove', e => {
+    if (dragX === null || !running) return;
+    const nx = e.touches[0].clientX;
+    worldX += (dragX - nx) * 1.2;
+    facing = (dragX - nx) >= 0 ? 1 : -1;
+    dragX = nx;
+  }, { passive: true });
+  addEventListener('touchend', () => dragX = null);
+
+  // ================= loop =================
+  let last = null;
+  function loop(t) {
+    if (last === null) last = t;
+    const dt = Math.min((t - last) / 1000, 0.05);
+    last = t;
+
+    // gerak horizontal
+    let moving = false;
+    if (keys.right) { worldX += SPEED * dt; facing = 1; moving = true; }
+    if (keys.left)  { worldX -= SPEED * dt; facing = -1; moving = true; }
+    worldX = Math.max(40, Math.min(WORLD_W - CHAR_W() - 40, worldX));
+
+    // loncat / gravitasi
+    if (!onGround) {
+      y += vy * dt;
+      vy -= GRAVITY * dt;
+      if (y <= 0) { y = 0; vy = 0; onGround = true; }
+    }
+
+    // animasi kaki
+    charEl.classList.toggle('f1', (!onGround) || (moving && Math.floor(t / 130) % 2 === 1));
+    charEl.classList.toggle('face-left', facing === -1);
+
+    // kamera
+    const vw = innerWidth;
+    const cam = Math.max(0, Math.min(WORLD_W - vw, worldX - vw * 0.32));
+    layerMain.style.transform = 'translate3d(' + (-cam) + 'px,0,0)';
+    layerDeco.style.transform = 'translate3d(' + (-cam * 0.6) + 'px,0,0)';
+    layerClouds.style.transform = 'translate3d(' + (-cam * 0.3) + 'px,0,0)';
+    charEl.style.transform = 'translate3d(' + worldX + 'px,' + (-y) + 'px,0)';
+
+    // progress
+    progressFill.style.width = Math.min(100, (worldX / (WORLD_W - 300)) * 100).toFixed(1) + '%';
+
+    // koin: tabrakan sederhana
+    const cw = CHAR_W();
+    coinEls.forEach(el => {
+      if (el.classList.contains('got')) return;
+      const cx = +el.dataset.x + 13, cy = +el.dataset.y + 13;
+      if (Math.abs((worldX + cw / 2) - cx) < cw / 2 && Math.abs(y + 40 - cy) < 55) {
+        el.classList.add('got');
+        addCoins(1);
+      }
+    });
+
+    // skill bars terisi saat didekati
+    if (!skillsFilled && worldX > 2450 - vw * 0.6) {
+      skillsFilled = true;
+      document.querySelectorAll('#skills-board .skill').forEach(s => {
+        s.querySelector('.bar i').style.width = s.dataset.lv + '%';
+      });
+    }
+
+    // sampai finish
+    if (!finishShown && worldX > 6000) {
+      finishShown = true;
+      showHint('🏁 STAGE CLEAR! MAKASIH SUDAH MAIN!', 3000);
+      addCoins(5);
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  // ================= util =================
+  let hintTimer;
+  function showHint(text, ms) {
+    hint.textContent = text;
+    hint.classList.remove('hidden');
+    clearTimeout(hintTimer);
+    hintTimer = setTimeout(() => hint.classList.add('hidden'), ms);
+  }
+
   document.getElementById('copy-email').addEventListener('click', e => {
     e.preventDefault();
     navigator.clipboard.writeText('zeindhikral@gmail.com').then(() => {
-      e.target.textContent = '✅ COPIED!';
-      setTimeout(() => e.target.textContent = '📋 COPY EMAIL', 1500);
+      e.target.textContent = '✅ OK!';
+      setTimeout(() => e.target.textContent = '📋 COPY', 1500);
     });
   });
 
-  // ===== konami code =====
-  const konami = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  // ================= konami =================
+  const seq = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
   let ki = 0;
-  document.addEventListener('keydown', e => {
-    ki = (e.key === konami[ki]) ? ki + 1 : (e.key === konami[0] ? 1 : 0);
-    if (ki === konami.length) {
+  function konami(key) {
+    ki = (key === seq[ki]) ? ki + 1 : (key === seq[0] ? 1 : 0);
+    if (ki === seq.length) {
       document.body.classList.toggle('rainbow');
-      coins += 30;
-      coinCount.textContent = coins;
+      addCoins(30);
+      showHint('🌈 RAINBOW MODE!', 2000);
       ki = 0;
     }
-  });
+  }
 </script>
 </body>
 </html>
