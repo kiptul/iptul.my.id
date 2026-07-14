@@ -5,4 +5,5 @@ deployment:
     - /bin/cp -f index.html $DEPLOYPATH
     - /bin/cp -f index.php $DEPLOYPATH
     - /bin/cp -f .htaccess $DEPLOYPATH
-    - /bin/chmod 644 $DEPLOYPATH/index.html $DEPLOYPATH/index.php $DEPLOYPATH/.htaccess
+    - /bin/cp -f og.png $DEPLOYPATH
+    - /bin/chmod 644 $DEPLOYPATH/index.html $DEPLOYPATH/index.php $DEPLOYPATH/.htaccess $DEPLOYPATH/og.png

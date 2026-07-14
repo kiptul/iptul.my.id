@@ -4,11 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>IPTUL.LONCAT — Pixel Portfolio</title>
-<meta name="description" content="Portofolio interaktif Iptul — jalan dan loncat melewati dunia pixel untuk menjelajahi skill, project, dan kontak.">
+<meta name="description" content="Portofolio interaktif Iptul, Prompt Developer — jalan dan loncat melewati dunia pixel untuk menjelajahi skill, project, dan kontak.">
+<meta name="theme-color" content="#8fd6ff">
+<meta property="og:type" content="website">
+<meta property="og:title" content="IPTUL.LONCAT — Pixel Portfolio">
+<meta property="og:description" content="Portofolio berbentuk game side-scroller: jalan, loncat, dan kumpulkan koin sambil kenalan sama Iptul, Prompt Developer.">
+<meta property="og:url" content="https://iptul.my.id/">
+<meta property="og:image" content="https://iptul.my.id/og.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%2387d2ff'/><rect x='3' y='3' width='10' height='10' fill='%23ffc93c'/><rect x='5' y='5' width='6' height='6' fill='%23ff6b6b'/></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Person","name":"Iptul","jobTitle":"Prompt Developer","url":"https://iptul.my.id/","email":"mailto:zeindhikral@gmail.com","sameAs":["https://github.com/kiptul"]}
+</script>
 <style>
   :root {
     --sky: #8fd6ff;
@@ -86,16 +96,30 @@
     border-bottom: 4px solid var(--border);
   }
   #hud .logo { font-family: 'Press Start 2P', monospace; font-size: 11px; color: var(--coral); white-space: nowrap; }
-  #progress { flex: 1; max-width: 320px; height: 14px; border: 3px solid var(--border); background: #efe6d4; position: relative; }
+  #progress { flex: 1; max-width: 340px; height: 14px; border: 3px solid var(--border); background: #efe6d4; position: relative; margin: 0 8px; }
   #progress i { display: block; height: 100%; width: 0%; background: repeating-linear-gradient(90deg, var(--leaf) 0 8px, #6fe397 8px 16px); }
-  #progress .flag { position: absolute; right: -4px; top: -20px; font-size: 14px; }
-  #coins { font-family: 'Press Start 2P', monospace; font-size: 10px; color: #c9962a; white-space: nowrap; }
+  #progress .flag { position: absolute; right: -6px; top: -20px; font-size: 14px; }
+  .dot {
+    position: absolute; top: -8px; width: 14px; height: 14px;
+    background: var(--panel); border: 3px solid var(--border);
+    transform: translateX(-50%); cursor: pointer; z-index: 2;
+  }
+  .dot::after { /* area tap lebih besar */
+    content: ""; position: absolute; inset: -10px;
+  }
+  .dot.passed { background: var(--sun); }
+  .dot.active { background: var(--coral); }
+  #hud .right { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+  #coins { font-family: 'Press Start 2P', monospace; font-size: 10px; color: #c9962a; }
+  #mute {
+    font-size: 18px; background: none; border: 3px solid var(--border);
+    width: 36px; height: 36px; cursor: pointer; background: var(--panel);
+  }
 
   /* ================= GAME VIEWPORT ================= */
   #viewport { position: fixed; inset: 0; overflow: hidden; }
   .layer { position: absolute; inset: 0; will-change: transform; }
 
-  /* matahari fixed */
   #sun {
     position: fixed; top: 64px; right: 34px; z-index: 1;
     width: 56px; height: 56px; background: var(--sun);
@@ -103,6 +127,11 @@
     animation: sunpulse 3s steps(3) infinite;
   }
   @keyframes sunpulse { 50% { box-shadow: 0 0 0 14px #ffd96a66; } }
+
+  #sunset {
+    position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0;
+    background: linear-gradient(180deg, rgba(255,120,60,.55) 0%, rgba(255,201,60,.25) 55%, transparent 100%);
+  }
 
   .cloud { position: absolute; height: 24px; background: #fff; opacity: .85; }
   .cloud::before { content: ""; position: absolute; width: 24px; height: 16px; background: #fff; top: -16px; left: 16px; }
@@ -113,6 +142,16 @@
   .tree::before { content: ""; position: absolute; width: 56px; height: 48px; left: -20px; top: -40px; background: var(--leaf); box-shadow: 0 -12px 0 -6px var(--leaf-dark) inset; }
   .bush { position: absolute; bottom: var(--ground-h); width: 44px; height: 22px; background: var(--leaf); }
   .bush::before { content: ""; position: absolute; width: 22px; height: 14px; top: -14px; left: 11px; background: var(--leaf); }
+
+  .bird { position: absolute; width: 20px; height: 10px; background: #fff; will-change: transform; }
+  .bird::before, .bird::after {
+    content: ""; position: absolute; top: -6px; width: 8px; height: 8px; background: #fff;
+    animation: flap .4s steps(2) infinite;
+  }
+  .bird::before { left: 0; }
+  .bird::after { right: 0; }
+  .bird .beak { position: absolute; right: -6px; top: 2px; width: 6px; height: 5px; background: var(--sun); }
+  @keyframes flap { 50% { transform: translateY(6px); } }
 
   #ground {
     position: absolute; left: 0; bottom: 0; height: var(--ground-h);
@@ -126,6 +165,13 @@
   #ground::after {
     content: ""; position: absolute; top: 26px; left: 0; right: 0; bottom: 0;
     background: repeating-linear-gradient(90deg, #b98a52 0 26px, #a87944 26px 52px);
+  }
+
+  .platform {
+    position: absolute; height: 24px;
+    background: var(--leaf);
+    border-top: 7px solid var(--leaf-dark);
+    box-shadow: inset 0 -10px 0 0 #b98a52;
   }
 
   /* ================= PAPAN KONTEN ================= */
@@ -147,7 +193,7 @@
   .board h2::before { content: "▶ "; color: var(--coral); }
   .board p { margin-bottom: 10px; }
 
-  .sign { /* papan kecil penunjuk arah */
+  .sign {
     position: absolute; bottom: calc(var(--ground-h) + 40px);
     background: var(--wood); color: #ffe9c9;
     font-family: 'Press Start 2P', monospace; font-size: 9px;
@@ -173,6 +219,7 @@
   .quest { width: 300px; }
   .quest .status { position: absolute; top: -14px; right: 10px; font-family: 'Press Start 2P', monospace; font-size: 8px; padding: 4px 8px; background: var(--coral); color: #fff; }
   .quest .status.done { background: var(--leaf); }
+  .quest .status.locked { background: var(--soft); }
   .quest h3 { font-size: 10px; color: var(--ocean); line-height: 1.8; margin-bottom: 6px; }
   .quest .diff { color: #e0a41a; letter-spacing: 3px; font-size: 17px; margin-bottom: 6px; }
   .quest p { color: var(--soft); font-size: 18px; }
@@ -193,7 +240,6 @@
   .btn.alt2 { background: var(--sun); color: var(--ink); box-shadow: 0 5px 0 0 #c9962a; }
   .btn.alt2:active { box-shadow: 0 1px 0 0 #c9962a; }
 
-  /* bendera finish */
   #flag { position: absolute; bottom: var(--ground-h); width: 12px; height: 150px; background: var(--border); }
   #flag::before {
     content: ""; position: absolute; top: 0; left: 12px;
@@ -202,17 +248,18 @@
   }
   @keyframes wave { 50% { transform: scaleY(.85); } }
 
-  /* ================= KOIN ================= */
+  /* ================= KOIN & PARTIKEL ================= */
   .coin {
     position: absolute; width: 26px; height: 26px;
     background: var(--sun); border: 3px solid #c9962a;
-    border-radius: 0;
     display: flex; align-items: center; justify-content: center;
     font-family: 'Press Start 2P', monospace; font-size: 10px; color: #a8791b;
     animation: coinspin 1s steps(4) infinite;
   }
   @keyframes coinspin { 50% { transform: scaleX(.3); } }
   .coin.got { display: none; }
+
+  .particle { position: absolute; left: 0; bottom: var(--ground-h); display: none; pointer-events: none; will-change: transform; }
 
   /* ================= KARAKTER ================= */
   #char {
@@ -260,8 +307,8 @@
 
   @media (max-width: 560px) {
     body { font-size: 18px; }
-    #hud .logo { font-size: 9px; }
-    #progress { max-width: 130px; }
+    #hud .logo { display: none; }
+    #progress { max-width: none; }
     #char { width: 78px; height: 78px; }
     #char .shadow { left: 19px; width: 40px; }
     .skill { min-width: 220px; }
@@ -274,7 +321,7 @@
 <!-- START SCREEN -->
 <div id="start-screen">
   <h1>IPTUL.LONCAT</h1>
-  <div class="sub px">— PIXEL PORTFOLIO v3.0 · WORLD 1-1 —</div>
+  <div class="sub px">— PIXEL PORTFOLIO v4.0 · WORLD 1-1 —</div>
   <button id="press-start" class="blink">▶ PRESS START ◀</button>
   <div class="sub px" style="font-size:8px;">© 2026 IPTUL GAMES · INSERT COIN</div>
 </div>
@@ -283,10 +330,14 @@
 <div id="hud">
   <span class="logo">IPTUL.LONCAT</span>
   <div id="progress"><i></i><span class="flag">🏁</span></div>
-  <span id="coins">🪙 <span id="coin-count">0</span></span>
+  <div class="right">
+    <span id="coins">🪙 <span id="coin-count">0</span></span>
+    <button id="mute" title="suara">🔊</button>
+  </div>
 </div>
 
 <div id="sun"></div>
+<div id="sunset"></div>
 
 <!-- DUNIA -->
 <div id="viewport">
@@ -308,14 +359,14 @@
     <!-- character info -->
     <div class="board pixel-box" style="left:1150px;">
       <h2>CHARACTER INFO</h2>
-      <p>Halo! Saya <b style="color:var(--coral)">Iptul</b> — web developer yang suka ngoding
-      sambil nostalgia game retro. Misi: bikin website yang cepat, rapi, dan
-      menyenangkan dipakai.</p>
+      <p>Halo! Saya <b style="color:var(--coral)">Iptul</b> — <b>Prompt Developer</b>.
+      Saya membangun produk digital dengan meracik prompt dan berkolaborasi bareng AI:
+      dari ide, jadi kode, jadi rilis.</p>
       <div class="stat-grid">
-        <div class="stat"><span>CLASS</span><b>WEB DEV</b></div>
+        <div class="stat"><span>CLASS</span><b>PROMPT DEV</b></div>
         <div class="stat"><span>GUILD</span><b>OPEN SOURCE</b></div>
         <div class="stat"><span>BASE</span><b>INDONESIA</b></div>
-        <div class="stat"><span>WEAPON</span><b>KEYBOARD</b></div>
+        <div class="stat"><span>WEAPON</span><b>PROMPT + AI</b></div>
         <div class="stat"><span>BUFF</span><b>KOPI ☕</b></div>
         <div class="stat"><span>STATUS</span><b>OPEN TO WORK</b></div>
       </div>
@@ -326,44 +377,53 @@
     <!-- skills -->
     <div class="board pixel-box" id="skills-board" style="left:2450px;">
       <h2>SKILL TREE</h2>
-      <div class="skill" data-lv="90"><div class="label"><span>HTML / CSS</span><span class="lv">LV.90</span></div><div class="bar"><i></i></div></div>
-      <div class="skill" data-lv="82"><div class="label"><span>JAVASCRIPT</span><span class="lv">LV.82</span></div><div class="bar"><i></i></div></div>
-      <div class="skill" data-lv="70"><div class="label"><span>REACT / NEXT.JS</span><span class="lv">LV.70</span></div><div class="bar"><i></i></div></div>
-      <div class="skill" data-lv="65"><div class="label"><span>NODE.JS</span><span class="lv">LV.65</span></div><div class="bar"><i></i></div></div>
+      <div class="skill" data-lv="95"><div class="label"><span>PROMPT ENGINEERING</span><span class="lv">LV.95</span></div><div class="bar"><i></i></div></div>
+      <div class="skill" data-lv="85"><div class="label"><span>AI PAIR CODING</span><span class="lv">LV.85</span></div><div class="bar"><i></i></div></div>
+      <div class="skill" data-lv="80"><div class="label"><span>HTML / CSS / JS</span><span class="lv">LV.80</span></div><div class="bar"><i></i></div></div>
+      <div class="skill" data-lv="70"><div class="label"><span>PHP / LARAVEL</span><span class="lv">LV.70</span></div><div class="bar"><i></i></div></div>
+      <div class="skill" data-lv="65"><div class="label"><span>TYPESCRIPT</span><span class="lv">LV.65</span></div><div class="bar"><i></i></div></div>
       <div class="skill" data-lv="60"><div class="label"><span>GIT / GITHUB</span><span class="lv">LV.60</span></div><div class="bar"><i></i></div></div>
-      <div class="skill" data-lv="55"><div class="label"><span>UI / UX</span><span class="lv">LV.55</span></div><div class="bar"><i></i></div></div>
     </div>
 
     <div class="sign" style="left:3450px;">QUEST LOG →</div>
 
-    <!-- quests -->
+    <!-- quests: project asli -->
     <div class="board pixel-box quest" style="left:3750px;">
       <span class="status done">CLEAR!</span>
       <h3>PERSONAL WEBSITE</h3>
       <div class="diff">★★☆☆☆</div>
-      <p>Portofolio side-scroller pixel yang sedang kamu mainkan. HTML, CSS, JS murni — tanpa framework.</p>
+      <p>Portofolio side-scroller pixel yang sedang kamu mainkan. Single file, tanpa framework, full vibes.</p>
       <div class="tags"><span>HTML</span><span>CSS</span><span>JS</span></div>
       <a href="https://github.com/kiptul/iptul.my.id" target="_blank" rel="noopener">▶ VIEW REPO</a>
     </div>
     <div class="board pixel-box quest" style="left:4160px;">
       <span class="status">ON GOING</span>
-      <h3>PROJECT #2</h3>
-      <div class="diff">★★★☆☆</div>
-      <p>Slot quest berikutnya. Deskripsi project akan muncul setelah quest dimulai. Stay tuned!</p>
-      <div class="tags"><span>SOON</span></div>
+      <h3>ELDEMY SEKOLAH</h3>
+      <div class="diff">★★★★☆</div>
+      <p>Platform manajemen sekolah: web + aplikasi. Backend PHP, aplikasi TypeScript.</p>
+      <div class="tags"><span>PHP</span><span>TYPESCRIPT</span><span>APP</span></div>
+      <a href="https://github.com/kiptul/eldemy-sekolah" target="_blank" rel="noopener">▶ VIEW REPO</a>
     </div>
     <div class="board pixel-box quest" style="left:4570px;">
-      <span class="status">LOCKED</span>
-      <h3>PROJECT #3</h3>
+      <span class="status">ON GOING</span>
+      <h3>ELDEMY API</h3>
+      <div class="diff">★★★☆☆</div>
+      <p>Backend API untuk ekosistem Eldemy — dibangun dengan Laravel.</p>
+      <div class="tags"><span>LARAVEL</span><span>REST API</span></div>
+      <a href="https://github.com/kiptul/eldemy-api" target="_blank" rel="noopener">▶ VIEW REPO</a>
+    </div>
+    <div class="board pixel-box quest" style="left:4980px;">
+      <span class="status locked">LOCKED 🔒</span>
+      <h3>PEMUTAR FREKUENSI</h3>
       <div class="diff">★★★★★</div>
-      <p>??? — Quest rahasia. Butuh level lebih tinggi (atau kolaborasi!) untuk membukanya.</p>
-      <div class="tags"><span>???</span></div>
+      <p>Pemutar frekuensi audio. Repo private — quest ini benar-benar terkunci. 😏</p>
+      <div class="tags"><span>AUDIO</span><span>???</span></div>
     </div>
 
-    <div class="sign" style="left:5250px;">FINAL STAGE →</div>
+    <div class="sign" style="left:5650px;">FINAL STAGE →</div>
 
     <!-- final -->
-    <div class="board pixel-box" style="left:5550px;">
+    <div class="board pixel-box" style="left:5950px;">
       <h2>NEW GAME+?</h2>
       <p>Kamu sudah sampai garis finish! 🎉<br>Petualangan baru menanti — ayo kolaborasi.</p>
       <div class="contact-links">
@@ -373,42 +433,33 @@
       </div>
     </div>
 
-    <div id="flag" style="left:6150px;"></div>
+    <div id="flag" style="left:6800px;"></div>
 
     <!-- karakter -->
     <div id="char">
       <div class="shadow"></div>
       <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-        <!-- rambut -->
         <rect x="4" y="1" width="8" height="2" fill="#5b4636"/>
         <rect x="3" y="2" width="2" height="3" fill="#5b4636"/>
         <rect x="11" y="2" width="2" height="3" fill="#5b4636"/>
-        <!-- wajah -->
         <rect x="4" y="3" width="8" height="5" fill="#ffd9a8"/>
-        <!-- mata -->
         <rect x="5" y="5" width="2" height="2" fill="#3a2f28"/>
         <rect x="9" y="5" width="2" height="2" fill="#3a2f28"/>
         <rect x="5" y="5" width="1" height="1" fill="#2fa8f5"/>
         <rect x="9" y="5" width="1" height="1" fill="#2fa8f5"/>
-        <!-- pipi -->
         <rect x="4" y="6" width="1" height="1" fill="#ffab91"/>
         <rect x="11" y="6" width="1" height="1" fill="#ffab91"/>
-        <!-- senyum -->
         <rect x="6" y="7" width="1" height="1" fill="#c96a4a"/>
         <rect x="7" y="7" width="2" height="1" fill="#e0855f"/>
         <rect x="9" y="7" width="1" height="1" fill="#c96a4a"/>
-        <!-- badan -->
         <rect x="4" y="8" width="8" height="5" fill="#ff6b6b"/>
         <rect x="4" y="8" width="8" height="1" fill="#c94a4a"/>
-        <!-- tangan -->
         <rect x="2" y="9" width="2" height="3" fill="#ffd9a8"/>
         <rect x="12" y="9" width="2" height="3" fill="#ffd9a8"/>
-        <!-- kaki frame A (diam) -->
         <g class="legA">
           <rect x="5" y="13" width="2" height="2" fill="#5b4636"/>
           <rect x="9" y="13" width="2" height="2" fill="#5b4636"/>
         </g>
-        <!-- kaki frame B (melangkah) -->
         <g class="legB">
           <rect x="3" y="13" width="2" height="2" fill="#5b4636"/>
           <rect x="11" y="13" width="2" height="2" fill="#5b4636"/>
@@ -418,7 +469,6 @@
   </div>
 </div>
 
-<!-- petunjuk -->
 <div id="hint" class="hidden px"></div>
 
 <!-- kontrol sentuh -->
@@ -440,26 +490,85 @@
 </noscript>
 
 <script>
-  // ================= konstanta dunia =================
-  const WORLD_W = 6400;
-  const CHAR_W = () => charEl.offsetWidth;
-  const SPEED = 300;        // px/detik
-  const GRAVITY = 1900;     // px/detik^2
-  const JUMP_V = 720;       // px/detik
+  // ================= konstanta =================
+  const WORLD_W = 7600;
+  const SPEED = 300;
+  const GRAVITY = 1900;
+  const JUMP_V = 760;
+  const TRAVEL_SPEED = 4200;
 
   const charEl = document.getElementById('char');
   const layerMain = document.getElementById('layer-main');
   const layerDeco = document.getElementById('layer-deco');
   const layerClouds = document.getElementById('layer-clouds');
+  const progressEl = document.getElementById('progress');
   const progressFill = document.querySelector('#progress i');
+  const sunsetEl = document.getElementById('sunset');
   const coinCount = document.getElementById('coin-count');
   const hint = document.getElementById('hint');
+  const CHAR_W = () => charEl.offsetWidth;
 
   document.getElementById('ground').style.width = WORLD_W + 'px';
 
-  // ================= dekorasi & awan (dibangun sekali) =================
+  // ================= audio chiptune (WebAudio, tanpa file) =================
+  let AC = null;
+  let muted = localStorage.getItem('iptul-mute') === '1';
+  let musicTimer = null, musicStep = 0;
+  const muteBtn = document.getElementById('mute');
+  muteBtn.textContent = muted ? '🔇' : '🔊';
+
+  function beep(f0, f1, dur, type, vol, when) {
+    if (!AC || muted) return;
+    try {
+      const t = AC.currentTime + (when || 0);
+      const o = AC.createOscillator(), g = AC.createGain();
+      o.type = type || 'square';
+      o.frequency.setValueAtTime(f0, t);
+      if (f1) o.frequency.linearRampToValueAtTime(f1, t + dur);
+      g.gain.setValueAtTime(vol || .12, t);
+      g.gain.exponentialRampToValueAtTime(.001, t + dur);
+      o.connect(g); g.connect(AC.destination);
+      o.start(t); o.stop(t + dur + .03);
+    } catch (e) {}
+  }
+  const sfx = {
+    jump()   { beep(300, 620, .15, 'square', .1); },
+    coin()   { beep(1318, 0, .08, 'square', .1); beep(1975, 0, .14, 'square', .1, .08); },
+    clear()  { [523, 659, 784, 1046].forEach((f, i) => beep(f, 0, .16, 'square', .12, i * .13)); },
+    whoosh() { beep(180, 950, .22, 'triangle', .12); },
+    konami() { [784, 784, 880, 1046].forEach((f, i) => beep(f, 0, .1, 'square', .11, i * .1)); }
+  };
+  // melodi loop 16 langkah (0 = istirahat)
+  const MELODY = [392,0,494,0,587,494,392,0, 330,0,392,494,440,392,330,0];
+  const BASS   = [131,0,165,0,131,0,165,196, 110,0,131,0,110,131,98,0];
+  function startMusic() {
+    if (musicTimer) return;
+    const stepMs = (60 / 132 / 2) * 1000; // 132 BPM, 1/8
+    musicTimer = setInterval(() => {
+      if (!AC || muted) { musicStep++; return; }
+      const m = MELODY[musicStep % 16], b = BASS[musicStep % 16];
+      if (m) beep(m, 0, stepMs / 1000 * .85, 'square', .035);
+      if (b) beep(b, 0, stepMs / 1000 * .9, 'triangle', .07);
+      musicStep++;
+    }, stepMs);
+  }
+  function initAudio() {
+    if (AC) { try { AC.resume(); } catch (e) {} return; }
+    try {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      startMusic();
+    } catch (e) {}
+  }
+  muteBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    muted = !muted;
+    localStorage.setItem('iptul-mute', muted ? '1' : '0');
+    muteBtn.textContent = muted ? '🔇' : '🔊';
+    if (!muted) { initAudio(); sfx.coin(); }
+  });
+
+  // ================= dekorasi =================
   (function buildScenery() {
-    // bukit & pohon di layer deco (parallax 0.6x) — sebar sepanjang dunia
     for (let x = 100; x < WORLD_W * 0.6 + innerWidth; x += 420) {
       const far = Math.random() > .5;
       const h = document.createElement('div');
@@ -475,23 +584,61 @@
         layerDeco.appendChild(t);
       }
     }
-    // awan di layer clouds (parallax 0.3x)
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 16; i++) {
       const c = document.createElement('div');
       c.className = 'cloud';
       c.style.left = (Math.random() * (WORLD_W * 0.3 + innerWidth)) + 'px';
-      c.style.top = (40 + Math.random() * 30) + '%';
       c.style.width = (56 + Math.random() * 60) + 'px';
       c.style.top = (8 + Math.random() * 32) + 'vh';
       layerClouds.appendChild(c);
     }
   })();
 
+  // burung-burung
+  const birds = [];
+  for (let i = 0; i < 3; i++) {
+    const el = document.createElement('div');
+    el.className = 'bird';
+    el.innerHTML = '<span class="beak"></span>';
+    if (i === 1) el.style.background = '#ffd0d0';
+    layerDeco.appendChild(el);
+    birds.push({
+      el,
+      x: Math.random() * WORLD_W * 0.6,
+      y0: 180 + Math.random() * 160,
+      amp: 20 + Math.random() * 25,
+      spd: 40 + Math.random() * 40,
+      ph: Math.random() * 6.28
+    });
+  }
+
+  // ================= platform =================
+  const platforms = [
+    { x: 1550, y: 90,  w: 120 },
+    { x: 1700, y: 150, w: 100 },
+    { x: 2900, y: 100, w: 140 },
+    { x: 4700, y: 90,  w: 120 },
+    { x: 4850, y: 160, w: 110 },
+    { x: 6380, y: 100, w: 130 }
+  ];
+  platforms.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'platform';
+    el.style.left = p.x + 'px';
+    el.style.width = p.w + 'px';
+    el.style.bottom = 'calc(var(--ground-h) + ' + p.y + 'px)';
+    layerMain.appendChild(el);
+  });
+
   // ================= koin =================
   const coinSpots = [
-    [760, 0], [830, 0], [1650, 60], [1730, 90], [1810, 60],
-    [2260, 0], [3050, 0], [3130, 60], [3210, 0],
-    [3560, 90], [5000, 0], [5080, 60], [5160, 90], [5240, 60], [5400, 0]
+    [760, 0], [830, 0],
+    [1585, 130], [1735, 195],
+    [2260, 0], [2955, 145],
+    [3050, 0], [3130, 60],
+    [3560, 90], [4300, 0],
+    [4740, 130], [4890, 205],
+    [5450, 0], [6430, 145], [6600, 0]
   ];
   const coinEls = coinSpots.map(([x, y]) => {
     const el = document.createElement('div');
@@ -514,21 +661,70 @@
     }
   }
 
+  // ================= partikel =================
+  const parts = [];
+  for (let i = 0; i < 28; i++) {
+    const el = document.createElement('div');
+    el.className = 'particle';
+    layerMain.appendChild(el);
+    parts.push({ el, life: 0 });
+  }
+  function spawnPart(x, y, color, vx, vy, life, size) {
+    const p = parts.find(p => p.life <= 0);
+    if (!p) return;
+    p.x = x; p.y = y; p.vx = vx; p.vy = vy; p.life = life; p.max = life;
+    p.el.style.background = color;
+    p.el.style.width = p.el.style.height = (size || 6) + 'px';
+    p.el.style.display = 'block';
+  }
+  function coinBurst(x, y) {
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * 6.28;
+      spawnPart(x, y, i % 2 ? '#ffc93c' : '#fff', Math.cos(a) * 90, Math.sin(a) * 90 + 60, .45, 6);
+    }
+  }
+
+  // ================= fast travel minimap =================
+  const SECTIONS = [
+    { x: 140,  name: 'START' },
+    { x: 1050, name: 'ABOUT' },
+    { x: 2350, name: 'SKILL' },
+    { x: 3650, name: 'QUEST' },
+    { x: 5850, name: 'CONTACT' }
+  ];
+  let travelTarget = null;
+  const dotEls = SECTIONS.map(s => {
+    const d = document.createElement('span');
+    d.className = 'dot';
+    d.title = s.name;
+    d.style.left = (s.x / WORLD_W * 100) + '%';
+    d.addEventListener('click', e => {
+      e.stopPropagation();
+      if (!running) startGame();
+      travelTarget = s.x;
+      sfx.whoosh();
+    });
+    progressEl.appendChild(d);
+    return d;
+  });
+
   // ================= state =================
-  let worldX = 140;         // posisi karakter di dunia
-  let y = 0, vy = 0;        // tinggi loncatan
+  let worldX = 140;
+  let y = 0, vy = 0;
   let onGround = true;
-  let facing = 1;           // 1 kanan, -1 kiri
+  let facing = 1;
   let keys = { left: false, right: false };
   let running = false;
   let skillsFilled = false;
   let finishShown = false;
+  let dustT = 0;
 
   // ================= kontrol =================
   const startScreen = document.getElementById('start-screen');
   function startGame() {
     if (running) return;
     running = true;
+    initAudio();
     startScreen.classList.add('hidden');
     const touch = matchMedia('(hover: none) and (pointer: coarse)').matches;
     document.getElementById('ctrl-hint').innerHTML = touch
@@ -539,7 +735,7 @@
   document.getElementById('press-start').addEventListener('click', startGame);
 
   function jump() {
-    if (onGround) { vy = JUMP_V; onGround = false; }
+    if (onGround) { vy = JUMP_V; onGround = false; sfx.jump(); }
   }
 
   document.addEventListener('keydown', e => {
@@ -555,7 +751,6 @@
     if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
   });
 
-  // tombol sentuh
   function bindHold(id, on, off) {
     const el = document.getElementById(id);
     ['pointerdown', 'touchstart'].forEach(ev => el.addEventListener(ev, e => { e.preventDefault(); on(); }, { passive: false }));
@@ -565,7 +760,6 @@
   bindHold('btn-left', () => { keys.left = true; }, () => keys.left = false);
   bindHold('btn-jump', () => { if (!running) startGame(); jump(); });
 
-  // scroll wheel & swipe = jalan juga (buat pengunjung yang nggak nyadar kontrol)
   addEventListener('wheel', e => {
     if (!running) return;
     worldX += (e.deltaY + e.deltaX) * 0.6;
@@ -574,7 +768,7 @@
 
   let dragX = null;
   addEventListener('touchstart', e => {
-    if (e.target.closest('.tbtn, a, button, .board')) return;
+    if (e.target.closest('.tbtn, a, button, .board, .dot')) return;
     dragX = e.touches[0].clientX;
   }, { passive: true });
   addEventListener('touchmove', e => {
@@ -586,31 +780,87 @@
   }, { passive: true });
   addEventListener('touchend', () => dragX = null);
 
+  // ================= fisika bantu =================
+  function feetOverlap(p, cw) {
+    return worldX + cw * .3 < p.x + p.w && worldX + cw * .7 > p.x;
+  }
+
   // ================= loop =================
   let last = null;
   function loop(t) {
     if (last === null) last = t;
     const dt = Math.min((t - last) / 1000, 0.05);
     last = t;
+    const cw = CHAR_W();
 
-    // gerak horizontal
+    // fast travel
     let moving = false;
-    if (keys.right) { worldX += SPEED * dt; facing = 1; moving = true; }
-    if (keys.left)  { worldX -= SPEED * dt; facing = -1; moving = true; }
-    worldX = Math.max(40, Math.min(WORLD_W - CHAR_W() - 40, worldX));
+    if (travelTarget !== null) {
+      const d = travelTarget - worldX;
+      const step = TRAVEL_SPEED * dt;
+      if (Math.abs(d) <= step) { worldX = travelTarget; travelTarget = null; }
+      else { worldX += Math.sign(d) * step; facing = Math.sign(d); moving = true; }
+    } else {
+      if (keys.right) { worldX += SPEED * dt; facing = 1; moving = true; }
+      if (keys.left)  { worldX -= SPEED * dt; facing = -1; moving = true; }
+    }
+    worldX = Math.max(40, Math.min(WORLD_W - cw - 40, worldX));
 
-    // loncat / gravitasi
+    // vertikal + platform
     if (!onGround) {
+      const prevY = y;
       y += vy * dt;
       vy -= GRAVITY * dt;
-      if (y <= 0) { y = 0; vy = 0; onGround = true; }
+      if (vy <= 0) {
+        for (const p of platforms) {
+          if (prevY >= p.y && y <= p.y && feetOverlap(p, cw)) { y = p.y; vy = 0; onGround = true; break; }
+        }
+      }
+      if (!onGround && y <= 0) { y = 0; vy = 0; onGround = true; }
+    } else if (y > 0) {
+      // masih ada pijakan?
+      let supported = false;
+      for (const p of platforms) {
+        if (Math.abs(y - p.y) < 2 && feetOverlap(p, cw)) { supported = true; break; }
+      }
+      if (!supported) { onGround = false; vy = 0; }
     }
 
-    // animasi kaki
+    // debu lari
+    if (moving && onGround) {
+      dustT -= dt;
+      if (dustT <= 0) {
+        dustT = .14;
+        spawnPart(worldX + cw / 2 - facing * 26, y + 4, '#b98a52', -facing * (40 + Math.random() * 40), 60 + Math.random() * 40, .35, 7);
+      }
+    }
+
+    // partikel update
+    for (const p of parts) {
+      if (p.life <= 0) continue;
+      p.life -= dt;
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vy -= 700 * dt;
+      if (p.y < 0) p.y = 0;
+      p.el.style.opacity = Math.max(p.life / p.max, 0);
+      p.el.style.transform = 'translate3d(' + p.x + 'px,' + (-p.y) + 'px,0)';
+      if (p.life <= 0) p.el.style.display = 'none';
+    }
+
+    // burung
+    for (const b of birds) {
+      b.x -= b.spd * dt;
+      if (b.x < -60) b.x = WORLD_W * 0.6 + Math.random() * 200;
+      const by = b.y0 + Math.sin(t / 500 + b.ph) * b.amp;
+      b.el.style.transform = 'translate3d(' + b.x + 'px,' + (innerHeight - by) + 'px,0)';
+    }
+
+    // animasi kaki + hadap
     charEl.classList.toggle('f1', (!onGround) || (moving && Math.floor(t / 130) % 2 === 1));
     charEl.classList.toggle('face-left', facing === -1);
 
-    // kamera
+    // kamera + parallax
     const vw = innerWidth;
     const cam = Math.max(0, Math.min(WORLD_W - vw, worldX - vw * 0.32));
     layerMain.style.transform = 'translate3d(' + (-cam) + 'px,0,0)';
@@ -618,21 +868,29 @@
     layerClouds.style.transform = 'translate3d(' + (-cam * 0.3) + 'px,0,0)';
     charEl.style.transform = 'translate3d(' + worldX + 'px,' + (-y) + 'px,0)';
 
-    // progress
-    progressFill.style.width = Math.min(100, (worldX / (WORLD_W - 300)) * 100).toFixed(1) + '%';
+    // progress + sunset + minimap
+    const prog = Math.min(1, worldX / (WORLD_W - 300));
+    progressFill.style.width = (prog * 100).toFixed(1) + '%';
+    sunsetEl.style.opacity = (prog * prog * 0.55).toFixed(3);
+    dotEls.forEach((d, i) => {
+      d.classList.toggle('passed', worldX >= SECTIONS[i].x);
+      const next = SECTIONS[i + 1] ? SECTIONS[i + 1].x : WORLD_W;
+      d.classList.toggle('active', worldX >= SECTIONS[i].x && worldX < next);
+    });
 
-    // koin: tabrakan sederhana
-    const cw = CHAR_W();
-    coinEls.forEach(el => {
-      if (el.classList.contains('got')) return;
+    // koin
+    for (const el of coinEls) {
+      if (el.classList.contains('got')) continue;
       const cx = +el.dataset.x + 13, cy = +el.dataset.y + 13;
       if (Math.abs((worldX + cw / 2) - cx) < cw / 2 && Math.abs(y + 40 - cy) < 55) {
         el.classList.add('got');
         addCoins(1);
+        sfx.coin();
+        coinBurst(cx, cy);
       }
-    });
+    }
 
-    // skill bars terisi saat didekati
+    // skill bars
     if (!skillsFilled && worldX > 2450 - vw * 0.6) {
       skillsFilled = true;
       document.querySelectorAll('#skills-board .skill').forEach(s => {
@@ -640,10 +898,11 @@
       });
     }
 
-    // sampai finish
-    if (!finishShown && worldX > 6000) {
+    // finish
+    if (!finishShown && worldX > 6650) {
       finishShown = true;
       showHint('🏁 STAGE CLEAR! MAKASIH SUDAH MAIN!', 3000);
+      sfx.clear();
       addCoins(5);
     }
 
@@ -675,6 +934,7 @@
     if (ki === seq.length) {
       document.body.classList.toggle('rainbow');
       addCoins(30);
+      sfx.konami();
       showHint('🌈 RAINBOW MODE!', 2000);
       ki = 0;
     }
