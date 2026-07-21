@@ -148,13 +148,44 @@
   }
   footer .px { font-size: 8px; color: var(--border); display: block; margin-bottom: 10px; }
 
+  /* ===== ANIMATED PIXEL BACKGROUND ===== */
+  #bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+  #bg .cloud {
+    position: absolute; height: 20px; background: #ffffffcc; border-radius: 2px;
+    animation: drift linear infinite;
+  }
+  #bg .cloud::before { content: ""; position: absolute; width: 22px; height: 14px; background: #ffffffcc; top: -12px; left: 14px; border-radius: 2px; }
+  @keyframes drift { from { transform: translateX(-140px); } to { transform: translateX(calc(100vw + 140px)); } }
+  #bg .star { position: absolute; width: 3px; height: 3px; background: #fff; opacity: .0; animation: twinkle ease-in-out infinite; }
+  @keyframes twinkle { 0%,100% { opacity: .15; } 50% { opacity: .9; } }
+  #bg .sun {
+    position: absolute; top: 40px; right: 6vw; width: 60px; height: 60px;
+    background: var(--sun); box-shadow: 0 0 0 8px #ffd96a55; animation: sunpulse 3.4s steps(3) infinite;
+  }
+  @keyframes sunpulse { 50% { box-shadow: 0 0 0 16px #ffd96a55; } }
+
+  /* ===== CARD ENTRANCE ===== */
+  .card { opacity: 0; transform: translateY(14px); }
+  .card.in { animation: pop .34s steps(5) forwards; }
+  @keyframes pop { to { opacity: 1; transform: translateY(0); } }
+
+  /* hi-score badge on a card */
+  .hiline {
+    font-family: 'Press Start 2P', monospace; font-size: 8px; color: #c9962a;
+    background: #fff7dd; border: 2px solid var(--border); padding: 5px 7px;
+    display: inline-flex; align-items: center; gap: 6px; align-self: flex-start;
+  }
+  .hiline b { color: var(--coral); }
+
   @media (max-width: 480px) {
     body { font-size: 19px; }
     .grid { grid-template-columns: 1fr; }
+    #bg .sun { width: 44px; height: 44px; top: 24px; }
   }
 </style>
 </head>
 <body>
+<div id="bg"><div class="sun"></div></div>
 <div class="wrap">
 
   <header>
@@ -181,6 +212,7 @@
         <h3>IPTUL.LONCAT</h3>
         <p>Side-scroller pixel: loncat ganda, tembak bug, kalahkan BUG KING lewat 3 stage yang makin brutal. Ada nyawa, skor, &amp; game over.</p>
         <div class="tags"><span>HTML</span><span>JS</span><span class="lic">ORIGINAL</span></div>
+        <div class="hiline" id="loncat-hi" hidden>🏆 HI-SCORE <b><span id="loncat-hi-val">0</span></b></div>
         <div class="actions">
           <a class="play" href="games/loncat/">▶ PLAY</a>
           <a class="src" href="https://github.com/kiptul/iptul.my.id" target="_blank" rel="noopener">SRC</a>
@@ -310,5 +342,58 @@
 </div>
 
 <style>.blink{animation:blink 1s steps(2) infinite}@keyframes blink{50%{opacity:.35}}</style>
+<script>
+  // background: awan melayang + bintang berkelip
+  (function () {
+    const bg = document.getElementById('bg');
+    for (let i = 0; i < 7; i++) {
+      const c = document.createElement('div');
+      c.className = 'cloud';
+      c.style.top = (4 + Math.random() * 46) + 'vh';
+      c.style.width = (44 + Math.random() * 46) + 'px';
+      c.style.animationDuration = (26 + Math.random() * 34) + 's';
+      c.style.animationDelay = (-Math.random() * 40) + 's';
+      c.style.opacity = (0.5 + Math.random() * 0.4).toFixed(2);
+      bg.appendChild(c);
+    }
+    for (let i = 0; i < 34; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.left = Math.random() * 100 + 'vw';
+      s.style.top = Math.random() * 62 + 'vh';
+      s.style.animationDuration = (1.6 + Math.random() * 2.4) + 's';
+      s.style.animationDelay = (-Math.random() * 4) + 's';
+      bg.appendChild(s);
+    }
+  })();
+
+  // hi-score IPTUL.LONCAT (localStorage sama-origin dengan game-nya)
+  (function () {
+    const hi = +localStorage.getItem('iptul-hiscore') || 0;
+    if (hi > 0) {
+      document.getElementById('loncat-hi-val').textContent = hi.toLocaleString('id-ID');
+      document.getElementById('loncat-hi').hidden = false;
+    }
+  })();
+
+  // animasi masuk kartu (staggered)
+  (function () {
+    const cards = [...document.querySelectorAll('.card')];
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      cards.forEach(c => { c.style.opacity = 1; c.style.transform = 'none'; });
+      return;
+    }
+    const io = new IntersectionObserver((ents) => {
+      ents.forEach((e, i) => {
+        if (e.isIntersecting) {
+          const el = e.target;
+          setTimeout(() => el.classList.add('in'), (cards.indexOf(el) % 4) * 70);
+          io.unobserve(el);
+        }
+      });
+    }, { threshold: 0.15 });
+    cards.forEach(c => io.observe(c));
+  })();
+</script>
 </body>
 </html>
