@@ -1,1 +1,0 @@
-# iptul.my.id
