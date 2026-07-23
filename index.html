@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zein Dhikral — Digital Craft & Direction</title>
+<meta name="description" content="Independent designer & engineer crafting considered digital experiences. Selected work, 2019—2026.">
+
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600&f[]=general-sans@400,500,600&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+
+<style>
+/* ————————————————————————————————
+   00 · TOKENS
+———————————————————————————————— */
+:root{
+  --bg:        #F7F5F2;
+  --surface:   #FFFFFF;
+  --ink:       #111111;
+  --ink-2:     #6B6B6B;
+  --hairline:  #D8D5CF;
+  --accent:    #C4002F;
+
+  --font-display: 'Clash Display', 'PP Neue Machina', sans-serif;
+  --font-head:    'General Sans', 'Neue Montreal', sans-serif;
+  --font-body:    'Satoshi', sans-serif;
+
+  --margin: clamp(1.25rem, 5vw, 5rem);
+  --ease: cubic-bezier(.19,1,.22,1);
+  --ease-2: cubic-bezier(.77,0,.175,1);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:auto;}
+html.lenis,html.lenis body{height:auto;}
+.lenis.lenis-smooth{scroll-behavior:auto!important;}
+
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:1rem;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+::selection{background:var(--ink);color:var(--bg);}
+a{color:inherit;text-decoration:none;}
+img{display:block;max-width:100%;}
+li{list-style:none;}
+
+@media (hover:hover) and (pointer:fine){
+  body{cursor:none;}
+  a,button{cursor:none;}
+}
+
+/* ————————————————————————————————
+   01 · GRAIN
+———————————————————————————————— */
+.grain{
+  position:fixed;inset:-100%;
+  z-index:2000;pointer-events:none;
+  opacity:.055;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 8s steps(10) infinite;
+}
+@keyframes grain{
+  0%,100%{transform:translate(0,0)}
+  10%{transform:translate(-5%,-10%)} 20%{transform:translate(-15%,5%)}
+  30%{transform:translate(7%,-25%)}  40%{transform:translate(-5%,25%)}
+  50%{transform:translate(-15%,10%)} 60%{transform:translate(15%,0)}
+  70%{transform:translate(0,15%)}    80%{transform:translate(3%,35%)}
+  90%{transform:translate(-10%,10%)}
+}
+
+/* ————————————————————————————————
+   02 · CURSOR
+———————————————————————————————— */
+.cursor{
+  position:fixed;top:0;left:0;z-index:2100;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--accent);
+  pointer-events:none;
+  transform:translate(-50%,-50%);
+  transition:width .35s var(--ease),height .35s var(--ease),background .35s var(--ease),opacity .3s;
+  mix-blend-mode:normal;
+  display:none;
+}
+.cursor .cursor-label{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-head);font-size:11px;font-weight:500;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--bg);
+  opacity:0;transition:opacity .25s;
+  white-space:nowrap;
+}
+.cursor.is-view{
+  width:88px;height:88px;background:var(--ink);
+}
+.cursor.is-view .cursor-label{opacity:1;}
+.cursor.is-link{width:40px;height:40px;background:transparent;border:1px solid var(--accent);}
+.cursor.is-hidden{opacity:0;}
+@media (hover:hover) and (pointer:fine){ .cursor{display:block;} }
+
+/* ————————————————————————————————
+   03 · PROGRESS
+———————————————————————————————— */
+.progress{
+  position:fixed;top:0;left:0;z-index:1500;
+  width:100%;height:2px;
+  transform-origin:0 0;transform:scaleX(0);
+  background:var(--accent);
+}
+
+/* ————————————————————————————————
+   04 · PRELOADER
+———————————————————————————————— */
+.loader{
+  position:fixed;inset:0;z-index:3000;
+  background:var(--ink);color:var(--bg);
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding:var(--margin);
+}
+.loader-word{
+  font-family:var(--font-display);font-weight:500;
+  font-size:clamp(2rem,6vw,5.5rem);line-height:1;
+  overflow:hidden;
+}
+.loader-word span{display:block;transform:translateY(110%);}
+.loader-count{
+  font-family:var(--font-head);font-size:clamp(3rem,10vw,9rem);
+  font-weight:500;line-height:1;font-variant-numeric:tabular-nums;
+}
+
+/* ————————————————————————————————
+   05 · NAV
+———————————————————————————————— */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:1400;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.6rem var(--margin);
+  transition:transform .7s var(--ease);
+}
+.nav.is-hidden{transform:translateY(-110%);}
+.nav-logo{
+  font-family:var(--font-head);font-weight:600;
+  font-size:.85rem;letter-spacing:.12em;text-transform:uppercase;
+}
+.nav-logo sup{color:var(--accent);font-size:.6em;margin-left:2px;}
+.nav-links{display:flex;gap:2.4rem;}
+.nav-links a{
+  font-family:var(--font-head);font-size:.72rem;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);
+  position:relative;padding:.2rem 0;
+  transition:color .4s;
+}
+.nav-links a::after{
+  content:"";position:absolute;left:0;bottom:0;
+  width:100%;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:100% 0;
+  transition:transform .5s var(--ease);
+}
+.nav-links a:hover{color:var(--ink);}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:0 0;}
+.nav-index{
+  font-family:var(--font-head);font-size:.72rem;letter-spacing:.14em;
+  color:var(--ink-2);font-variant-numeric:tabular-nums;
+}
+@media (max-width:760px){ .nav-links{display:none;} }
+
+/* ————————————————————————————————
+   06 · HERO
+———————————————————————————————— */
+.hero{
+  min-height:100svh;position:relative;
+  padding:0 var(--margin);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding-bottom:clamp(2rem,6vh,5rem);
+}
+.hero-meta{
+  position:absolute;top:7.5rem;left:var(--margin);
+  display:flex;flex-direction:column;gap:.3rem;
+  font-family:var(--font-head);font-size:.72rem;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);
+}
+.hero-meta em{font-style:normal;color:var(--accent);}
+.hero-image{
+  position:absolute;
+  top:14vh;right:calc(var(--margin) * 1.4);
+  width:clamp(220px,24vw,360px);
+  aspect-ratio:3/4;
+  overflow:hidden;
+}
+.hero-image img{
+  width:100%;height:120%;object-fit:cover;
+  filter:grayscale(1) contrast(1.05);
+  will-change:transform;
+}
+.hero-title{
+  font-family:var(--font-display);
+  font-weight:500;line-height:.92;
+  font-size:clamp(3.4rem,11.5vw,10.5rem);
+  letter-spacing:-0.015em;
+  text-transform:uppercase;
+}
+.hero-title .line{display:block;overflow:hidden;}
+.hero-title .line > span{display:block;transform:translateY(115%);}
+.hero-title .indent{margin-left:clamp(3rem,16vw,16rem);}
+.hero-title .outline{
+  color:transparent;
+  -webkit-text-stroke:1.5px var(--ink);
+}
+.hero-sub{
+  margin-top:2.4rem;
+  display:flex;justify-content:space-between;align-items:flex-end;
+  gap:2rem;flex-wrap:wrap;
+}
+.hero-sub p{
+  max-width:26ch;
+  font-size:.95rem;color:var(--ink-2);line-height:1.55;
+}
+.hero-scroll{
+  font-family:var(--font-head);font-size:.72rem;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);
+  display:flex;align-items:center;gap:.8rem;
+}
+.hero-scroll::after{
+  content:"";width:1px;height:3rem;background:var(--hairline);
+  animation:drip 2.4s var(--ease-2) infinite;
+  transform-origin:top;
+}
+@keyframes drip{
+  0%{transform:scaleY(0);transform-origin:top}
+  45%{transform:scaleY(1);transform-origin:top}
+  55%{transform:scaleY(1);transform-origin:bottom}
+  100%{transform:scaleY(0);transform-origin:bottom}
+}
+@media (max-width:760px){
+  .hero-image{top:auto;bottom:38vh;right:var(--margin);width:38vw;opacity:.9;}
+  .hero-meta{top:6rem;}
+}
+
+/* ————————————————————————————————
+   07 · SECTION LABEL SYSTEM
+———————————————————————————————— */
+.sec-head{
+  display:flex;align-items:baseline;justify-content:space-between;
+  padding:1.4rem var(--margin);
+  border-top:1px solid var(--hairline);
+}
+.sec-head .k{
+  font-family:var(--font-head);font-size:.72rem;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);
+}
+.sec-head .n{
+  font-family:var(--font-head);font-size:.72rem;letter-spacing:.1em;
+  color:var(--accent);font-variant-numeric:tabular-nums;
+}
+
+/* ————————————————————————————————
+   08 · WORK
+———————————————————————————————— */
+.work{padding-top:12vh;}
+.work-intro{
+  padding:0 var(--margin) 10vh;
+  display:grid;grid-template-columns:repeat(12,1fr);gap:1.5rem;
+}
+.work-intro h2{
+  grid-column:1/10;
+  font-family:var(--font-display);font-weight:500;
+  font-size:clamp(2.4rem,6.5vw,6rem);
+  line-height:1.02;letter-spacing:-.01em;text-transform:uppercase;
+}
+.work-intro h2 em{
+  font-style:normal;color:transparent;-webkit-text-stroke:1.2px var(--ink);
+}
+
+.project{
+  position:relative;
+  min-height:100svh;
+  display:grid;grid-template-columns:repeat(12,1fr);gap:1.5rem;
+  padding:9vh var(--margin);
+  border-top:1px solid var(--hairline);
+  align-content:center;
+}
+.project-media{
+  position:relative;overflow:hidden;
+  aspect-ratio:4/3;
+  background:var(--hairline);
+}
+.project-media img{
+  width:100%;height:118%;object-fit:cover;
+  will-change:transform;
+  transition:filter .8s var(--ease);
+}
+.project:hover .project-media img{filter:saturate(1.05);}
+.project-num{
+  position:absolute;z-index:2;
+  font-family:var(--font-display);font-weight:500;
+  font-size:clamp(4.5rem,11vw,10rem);line-height:1;
+  color:transparent;-webkit-text-stroke:1.2px var(--ink);
+  pointer-events:none;
+}
+.project-info h3{
+  font-family:var(--font-head);font-weight:500;
+  font-size:clamp(1.6rem,3vw,2.6rem);line-height:1.05;
+  letter-spacing:-.01em;margin-bottom:1.2rem;
+}
+.project-tags{
+  display:flex;gap:1.6rem;margin-bottom:1.6rem;
+  font-family:var(--font-head);font-size:.72rem;font-weight:500;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);
+}
+.project-tags .yr{color:var(--accent);}
+.project-info p{color:var(--ink-2);font-size:.95rem;max-width:34ch;}
+.project-link{
+  display:inline-flex;align-items:center;gap:.7rem;
+  margin-top:2rem;
+  font-family:var(--font-head);font-size:.75rem;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;
+  border-bottom:1px solid var(--ink);
+  padding-bottom:.35rem;
+  transition:border-color .4s,color .4s;
+}
+.project-link:hover{color:var(--accent);border-color:var(--accent);}
+
+/* alternating asymmetric compositions */
+.project:nth-child(odd) .project-media{grid-column:1/8;grid-row:1;}
+.project:nth-child(odd) .project-info{grid-column:9/13;grid-row:1;align-self:end;padding-bottom:4vh;}
+.project:nth-child(odd) .project-num{top:4vh;right:var(--margin);}
+.project:nth-child(even) .project-media{grid-column:6/13;grid-row:1;}
+.project:nth-child(even) .project-info{grid-column:1/5;grid-row:1;align-self:start;padding-top:4vh;}
+.project:nth-child(even) .project-num{bottom:4vh;left:var(--margin);}
+.project--tall .project-media{aspect-ratio:1/1.05;}
+
+@media (max-width:900px){
+  .project{align-content:start;padding-top:14vh;}
+  .project .project-media{grid-column:1/13!important;grid-row:auto!important;}
+  .project .project-info{grid-column:1/13!important;grid-row:auto!important;padding:2rem 0 0!important;}
+  .project .project-num{top:6vh!important;bottom:auto!important;right:var(--margin)!important;left:auto!important;}
+  .work-intro h2{grid-column:1/13;}
+}
+
+/* ————————————————————————————————
+   09 · ABOUT
+———————————————————————————————— */
+.about{padding:14vh 0 10vh;}
+.about-grid{
+  display:grid;grid-template-columns:repeat(12,1fr);gap:1.5rem;
+  padding:8vh var(--margin) 0;
+}
+.about-portrait{
+  grid-column:1/5;
+  position:relative;
+  margin-top:6vh;
+}
+.about-portrait .frame{overflow:hidden;aspect-ratio:3/4;background:var(--hairline);}
+.about-portrait img{
+  width:100%;height:118%;object-fit:cover;
+  filter:grayscale(1) contrast(1.08);
+  will-change:transform;
+}
+.about-portrait figcaption{
+  margin-top:.9rem;
+  font-family:var(--font-head);font-size:.7rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-2);
+  display:flex;justify-content:space-between;
+}
+.about-copy{grid-column:6/12;}
+.about-copy .lede{
+  font-family:var(--font-head);font-weight:500;
+  font-size:clamp(1.5rem,2.8vw,2.4rem);
+  line-height:1.25;letter-spacing:-.01em;
+  margin-bottom:3rem;
+}
+.about-copy .lede .hl{
+  color:var(--accent);
+}
+.about-cols{
+  display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;
+  color:var(--ink-2);font-size:.95rem;
+}
+.about-cols p + p{margin-top:1.2rem;}
+
+.timeline{
+  margin-top:12vh;
+  border-top:1px solid var(--hairline);
+}
+.timeline-row{
+  display:grid;grid-template-columns:repeat(12,1fr);gap:1.5rem;
+  padding:2.2rem var(--margin);
+  border-bottom:1px solid var(--hairline);
+  align-items:baseline;
+  transition:background .5s var(--ease);
+}
+.timeline-row:hover{background:var(--surface);}
+.timeline-row .t-year{
+  grid-column:1/3;
+  font-family:var(--font-display);font-weight:500;
+  font-size:clamp(1.6rem,3.4vw,3rem);line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+.timeline-row .t-title{
+  grid-column:3/8;
+  font-family:var(--font-head);font-weight:500;font-size:1.05rem;
+}
+.timeline-row .t-note{
+  grid-column:8/12;color:var(--ink-2);font-size:.9rem;
+}
+.timeline-row .t-mark{
+  grid-column:12/13;justify-self:end;
+  font-family:var(--font-head);font-size:.7rem;letter-spacing:.1em;
+  color:var(--accent);
+}
+@media (max-width:900px){
+  .about-grid{display:block;}
+  .about-portrait{margin:0 0 3rem;max-width:70%;}
+  .timeline-row{grid-template-columns:1fr;gap:.4rem;}
+  .timeline-row .t-mark{display:none;}
+}
+
+/* ————————————————————————————————
+   10 · EXPERIENCE
+———————————————————————————————— */
+.exp-list{border-top:1px solid var(--hairline);}
+.exp-row{
+  position:relative;
+  display:grid;grid-template-columns:repeat(12,1fr);gap:1.5rem;
+  align-items:center;
+  padding:3.2rem var(--margin);
+  border-bottom:1px solid var(--hairline);
+  overflow:hidden;
+}
+.exp-row .fill{
+  position:absolute;inset:0;background:var(--ink);
+  transform:scaleY(0);transform-origin:bottom;
+  transition:transform .55s var(--ease-2);
+}
+.exp-row:hover .fill{transform:scaleY(1);}
+.exp-row > *{position:relative;z-index:1;transition:color .45s;}
+.exp-row:hover .e-role,.exp-row:hover .e-years{color:var(--bg);}
+.exp-row:hover .e-org,.exp-row:hover .e-note{color:#9a9a9a;}
+.e-years{
+  grid-column:1/4;
+  font-family:var(--font-display);font-weight:500;
+  font-size:clamp(1.8rem,4.5vw,4rem);line-height:1;
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+}
+.e-role{
+  grid-column:4/8;
+  font-family:var(--font-head);font-weight:500;
+  font-size:clamp(1rem,1.6vw,1.35rem);
+}
+.e-org{grid-column:8/11;color:var(--ink-2);font-size:.9rem;}
+.e-note{
+  grid-column:11/13;justify-self:end;text-align:right;
+  font-family:var(--font-head);font-size:.7rem;font-weight:500;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);
+}
+@media (max-width:900px){
+  .exp-row{grid-template-columns:1fr;gap:.5rem;padding:2.4rem var(--margin);}
+  .e-note{justify-self:start;text-align:left;}
+}
+
+/* ————————————————————————————————
+   11 · TECHNOLOGY MARQUEE
+———————————————————————————————— */
+.tech{padding:16vh 0;overflow:hidden;}
+.tech-track{
+  display:flex;white-space:nowrap;will-change:transform;
+}
+.tech-track span{
+  font-family:var(--font-display);font-weight:500;
+  font-size:clamp(4rem,11vw,10rem);
+  line-height:1.05;text-transform:uppercase;letter-spacing:-.01em;
+  padding-right:4rem;
+}
+.tech-track .o{color:transparent;-webkit-text-stroke:1.2px var(--ink);}
+.tech-track .dot{color:var(--accent);}
+.tech-row + .tech-row{margin-top:1rem;}
+.tech-note{
+  padding:5vh var(--margin) 0;
+  display:flex;justify-content:flex-end;
+}
+.tech-note p{
+  max-width:32ch;color:var(--ink-2);font-size:.95rem;
+}
+
+/* ————————————————————————————————
+   12 · PHILOSOPHY
+———————————————————————————————— */
+.philosophy{
+  background:var(--ink);color:var(--bg);
+  padding:22vh var(--margin);
+  position:relative;
+}
+.philosophy .qmark{
+  position:absolute;
+  top:8vh;left:var(--margin);
+  font-family:var(--font-display);
+  font-size:clamp(8rem,20vw,18rem);line-height:.7;
+  color:transparent;-webkit-text-stroke:1px #3a3a3a;
+  user-select:none;
+}
+.philosophy blockquote{
+  max-width:22ch;
+  margin-left:auto;
+  font-family:var(--font-head);font-weight:500;
+  font-size:clamp(2rem,5.2vw,4.6rem);
+  line-height:1.12;letter-spacing:-.015em;
+}
+.philosophy blockquote .a{color:var(--accent);}
+.philosophy cite{
+  display:block;margin-top:4rem;
+  font-family:var(--font-head);font-style:normal;
+  font-size:.72rem;font-weight:500;letter-spacing:.14em;
+  text-transform:uppercase;color:#8a8a8a;
+  text-align:right;
+}
+
+/* ————————————————————————————————
+   13 · CONTACT
+———————————————————————————————— */
+.contact{padding:18vh 0 0;}
+.contact-inner{padding:0 var(--margin);}
+.contact-k{
+  font-family:var(--font-head);font-size:.72rem;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);
+  margin-bottom:3rem;display:flex;gap:.8rem;align-items:center;
+}
+.contact-k::before{content:"";width:2.4rem;height:1px;background:var(--accent);}
+.contact-mail{
+  display:block;
+  font-family:var(--font-display);font-weight:500;
+  font-size:clamp(2rem,7.2vw,7rem);
+  line-height:1;letter-spacing:-.015em;text-transform:uppercase;
+  width:fit-content;
+  position:relative;
+}
+.contact-mail::after{
+  content:"";position:absolute;left:0;bottom:-.06em;
+  width:100%;height:3px;background:var(--accent);
+  transform:scaleX(0);transform-origin:100% 0;
+  transition:transform .7s var(--ease);
+}
+.contact-mail:hover::after{transform:scaleX(1);transform-origin:0 0;}
+.contact-meta{
+  margin-top:10vh;
+  display:grid;grid-template-columns:repeat(12,1fr);gap:1.5rem;
+  padding:2.4rem var(--margin);
+  border-top:1px solid var(--hairline);
+  font-family:var(--font-head);font-size:.75rem;font-weight:500;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);
+}
+.contact-meta .c1{grid-column:1/4;}
+.contact-meta .c2{grid-column:4/7;display:flex;flex-direction:column;gap:.5rem;}
+.contact-meta .c3{grid-column:7/10;display:flex;flex-direction:column;gap:.5rem;}
+.contact-meta .c4{grid-column:10/13;text-align:right;}
+.contact-meta a{transition:color .35s;}
+.contact-meta a:hover{color:var(--accent);}
+.footer-line{
+  margin-top:6vh;padding:1.6rem var(--margin);
+  border-top:1px solid var(--hairline);
+  display:flex;justify-content:space-between;
+  font-family:var(--font-head);font-size:.68rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-2);
+}
+@media (max-width:900px){
+  .contact-meta{grid-template-columns:1fr 1fr;gap:2rem;}
+  .contact-meta .c1,.contact-meta .c2,.contact-meta .c3,.contact-meta .c4{grid-column:auto;text-align:left;}
+}
+
+/* ————————————————————————————————
+   14 · REVEALS
+———————————————————————————————— */
+.rv{opacity:0;transform:translateY(40px);}
+.rv-l{opacity:0;transform:translateY(24px);filter:blur(6px);}
+</style>
+</head>
+<body>
+
+<!-- GRAIN / CURSOR / PROGRESS -->
+<div class="grain"></div>
+<div class="cursor"><span class="cursor-label">View</span></div>
+<div class="progress"></div>
+
+<!-- PRELOADER -->
+<div class="loader">
+  <div class="loader-word"><span>Zein Dhikral</span></div>
+  <div class="loader-count">00</div>
+</div>
+
+<!-- NAV -->
+<header class="nav">
+  <a class="nav-logo" href="#top" data-magnetic>ZD<sup>®</sup></a>
+  <nav class="nav-links">
+    <a href="#work" data-magnetic>Work</a>
+    <a href="#about" data-magnetic>About</a>
+    <a href="#experience" data-magnetic>Experience</a>
+    <a href="#contact" data-magnetic>Contact</a>
+  </nav>
+  <div class="nav-index">JAKARTA — <span id="clock">00:00</span></div>
+</header>
+
+<main id="top">
+
+<!-- 02 · LANDING -->
+<section class="hero">
+  <div class="hero-meta">
+    <span>Independent practice</span>
+    <span>Design <em>&amp;</em> Engineering</span>
+    <span>Est. 2019</span>
+  </div>
+
+  <figure class="hero-image" data-parallax="0.12">
+    <img src="https://images.unsplash.com/photo-1486718448742-163732cd1544?q=80&w=900&auto=format&fit=crop" alt="Concrete architecture, repeating arches in natural light" loading="eager">
+  </figure>
+
+  <h1 class="hero-title">
+    <span class="line"><span>Considered</span></span>
+    <span class="line indent"><span class="outline">Digital</span></span>
+    <span class="line"><span>Craft</span></span>
+  </h1>
+
+  <div class="hero-sub">
+    <p class="rv-l">Zein Dhikral is an independent designer &amp; engineer building quiet, precise digital experiences for studios and cultural institutions.</p>
+    <div class="hero-scroll">Scroll</div>
+  </div>
+</section>
+
+<!-- 03 · SELECTED WORK -->
+<section class="work" id="work">
+  <div class="sec-head">
+    <span class="k">Selected Work</span>
+    <span class="n">03 — 01</span>
+  </div>
+
+  <div class="work-intro">
+    <h2 class="rv">Four projects,<br>chosen <em>slowly.</em></h2>
+  </div>
+
+  <article class="project">
+    <div class="project-media" data-scale>
+      <img src="https://images.unsplash.com/photo-1487958449943-2429e8be8625?q=80&w=1600&auto=format&fit=crop" alt="White modernist facade against sky" loading="lazy">
+    </div>
+    <span class="project-num">01</span>
+    <div class="project-info">
+      <div class="project-tags"><span class="yr">2026</span><span>Art Direction</span><span>Web</span></div>
+      <h3>Ruang Putih</h3>
+      <p>Digital identity and exhibition catalogue for a contemporary gallery in Bandung. Typography-led, almost silent.</p>
+      <a class="project-link" href="#contact" data-cursor="view" data-magnetic>Case study →</a>
+    </div>
+  </article>
+
+  <article class="project project--tall">
+    <div class="project-media" data-scale>
+      <img src="https://images.unsplash.com/photo-1493397212122-2b85dda8106b?q=80&w=1600&auto=format&fit=crop" alt="Undulating architectural facade" loading="lazy">
+    </div>
+    <span class="project-num">02</span>
+    <div class="project-info">
+      <div class="project-tags"><span class="yr">2025</span><span>Identity</span><span>Editorial</span></div>
+      <h3>Arsip Kota</h3>
+      <p>A living archive of Southeast Asian urban photography. Built like a magazine, read like a map.</p>
+      <a class="project-link" href="#contact" data-cursor="view" data-magnetic>Case study →</a>
+    </div>
+  </article>
+
+  <article class="project">
+    <div class="project-media" data-scale>
+      <img src="https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1600&auto=format&fit=crop" alt="Brutalist tower in monochrome" loading="lazy">
+    </div>
+    <span class="project-num">03</span>
+    <div class="project-info">
+      <div class="project-tags"><span class="yr">2024</span><span>Digital Product</span></div>
+      <h3>Meridian</h3>
+      <p>Reading environment for long-form journalism. Two typefaces, one accent, nothing else.</p>
+      <a class="project-link" href="#contact" data-cursor="view" data-magnetic>Case study →</a>
+    </div>
+  </article>
+
+  <article class="project project--tall">
+    <div class="project-media" data-scale>
+      <img src="https://images.unsplash.com/photo-1449157291145-7efd050a4d0e?q=80&w=1600&auto=format&fit=crop" alt="Glass and steel geometry" loading="lazy">
+    </div>
+    <span class="project-num">04</span>
+    <div class="project-info">
+      <div class="project-tags"><span class="yr">2023</span><span>Commerce</span><span>Direction</span></div>
+      <h3>Tenun</h3>
+      <p>Commerce as an exhibition — hand-woven textiles presented one object at a time.</p>
+      <a class="project-link" href="#contact" data-cursor="view" data-magnetic>Case study →</a>
+    </div>
+  </article>
+</section>
+
+<!-- 04 · ABOUT -->
+<section class="about" id="about">
+  <div class="sec-head">
+    <span class="k">About</span>
+    <span class="n">04</span>
+  </div>
+
+  <div class="about-grid">
+    <figure class="about-portrait rv">
+      <div class="frame" data-scale>
+        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=900&auto=format&fit=crop" alt="Black and white portrait" loading="lazy">
+      </div>
+      <figcaption><span>Portrait, natural light</span><span>Jakarta</span></figcaption>
+    </figure>
+
+    <div class="about-copy">
+      <p class="lede rv">I work at the intersection of <span class="hl">editorial design</span> and engineering — building websites the way a printer sets a page: with patience, restraint, and respect for the reader.</p>
+      <div class="about-cols rv">
+        <div>
+          <p>The practice began in 2019 with a borrowed laptop and a fascination for grid systems. Since then it has grown into a small independent studio of one, working with galleries, publications and founders who care about how things feel.</p>
+          <p>Most projects begin with typography and end with performance budgets. The two are never in conflict.</p>
+        </div>
+        <div>
+          <p>Away from the screen: film photography, second-hand bookshops, and long walks through cities that were never planned for walking.</p>
+          <p>Currently accepting a small number of commissions for 2027.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-row rv">
+      <span class="t-year">2019</span>
+      <span class="t-title">First commission</span>
+      <span class="t-note">A poetry archive, hand-coded over one long dry season.</span>
+      <span class="t-mark">●</span>
+    </div>
+    <div class="timeline-row rv">
+      <span class="t-year">2021</span>
+      <span class="t-title">Studio practice begins</span>
+      <span class="t-note">Left agency work to build slower, better things independently.</span>
+      <span class="t-mark">●</span>
+    </div>
+    <div class="timeline-row rv">
+      <span class="t-year">2024</span>
+      <span class="t-title">First international clients</span>
+      <span class="t-note">Editorial platforms in Amsterdam and Seoul.</span>
+      <span class="t-mark">●</span>
+    </div>
+    <div class="timeline-row rv">
+      <span class="t-year">2026</span>
+      <span class="t-title">Today</span>
+      <span class="t-note">Designing and building, one project at a time.</span>
+      <span class="t-mark">●</span>
+    </div>
+  </div>
+</section>
+
+<!-- 05 · EXPERIENCE -->
+<section class="experience" id="experience">
+  <div class="sec-head">
+    <span class="k">Experience</span>
+    <span class="n">05</span>
+  </div>
+  <div class="exp-list">
+    <div class="exp-row rv">
+      <span class="fill"></span>
+      <span class="e-years">2023—26</span>
+      <span class="e-role">Independent Designer &amp; Engineer</span>
+      <span class="e-org">Self-directed practice, Jakarta</span>
+      <span class="e-note">Current</span>
+    </div>
+    <div class="exp-row rv">
+      <span class="fill"></span>
+      <span class="e-years">2021—23</span>
+      <span class="e-role">Senior Frontend, Design Systems</span>
+      <span class="e-org">Digital studio, remote</span>
+      <span class="e-note">Contract</span>
+    </div>
+    <div class="exp-row rv">
+      <span class="fill"></span>
+      <span class="e-years">2019—21</span>
+      <span class="e-role">Web Designer &amp; Developer</span>
+      <span class="e-org">Creative agency, Bandung</span>
+      <span class="e-note">Full-time</span>
+    </div>
+  </div>
+</section>
+
+<!-- 06 · TECHNOLOGY -->
+<section class="tech" id="tech">
+  <div class="sec-head" style="margin-bottom:8vh">
+    <span class="k">Craft &amp; Tools</span>
+    <span class="n">06</span>
+  </div>
+
+  <div class="tech-row" data-marquee="1">
+    <div class="tech-track">
+      <span>Typescript<i class="dot">.</i></span><span class="o">React</span><span>Next<i class="dot">.</i>js</span><span class="o">WebGL</span>
+      <span>Typescript<i class="dot">.</i></span><span class="o">React</span><span>Next<i class="dot">.</i>js</span><span class="o">WebGL</span>
+    </div>
+  </div>
+  <div class="tech-row" data-marquee="-1">
+    <div class="tech-track">
+      <span class="o">GSAP</span><span>Node<i class="dot">.</i></span><span class="o">Figma</span><span>Motion<i class="dot">.</i></span>
+      <span class="o">GSAP</span><span>Node<i class="dot">.</i></span><span class="o">Figma</span><span>Motion<i class="dot">.</i></span>
+    </div>
+  </div>
+
+  <div class="tech-note">
+    <p class="rv-l">Tools change every season. The grid, the baseline, and the reader do not — so that is where the attention goes.</p>
+  </div>
+</section>
+
+<!-- 07 · PHILOSOPHY -->
+<section class="philosophy" id="philosophy">
+  <span class="qmark">“</span>
+  <blockquote class="rv">
+    Design is not what fills the page.<br>
+    It is what the page can <span class="a">afford to lose.</span>
+  </blockquote>
+  <cite>— Working principle, since 2019</cite>
+</section>
+
+<!-- 08 · CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-inner">
+    <div class="contact-k rv-l">Open for commissions — 2027</div>
+    <a class="contact-mail rv" href="mailto:zeindhikral@gmail.com" data-magnetic>Let's talk</a>
+  </div>
+
+  <div class="contact-meta">
+    <div class="c1">Zein Dhikral<br>Jakarta, ID</div>
+    <div class="c2">
+      <a href="mailto:zeindhikral@gmail.com">Email</a>
+      <a href="https://github.com/kiptul" target="_blank" rel="noopener">GitHub</a>
+    </div>
+    <div class="c3">
+      <a href="#work">Work</a>
+      <a href="#about">About</a>
+    </div>
+    <div class="c4">GMT +7<br><span id="clock2">00:00</span></div>
+  </div>
+
+  <div class="footer-line">
+    <span>© 2026 — Designed &amp; built by hand</span>
+    <span>iptul.my.id</span>
+  </div>
+</section>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ————— Smooth scroll ————— */
+let lenis = null;
+if (!reduced && window.Lenis) {
+  lenis = new Lenis({ duration: 1.15, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add(t => lenis.raf(t * 1000));
+  gsap.ticker.lagSmoothing(0);
+}
+
+/* ————— Clock ————— */
+function tick(){
+  const t = new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Jakarta'});
+  for (const el of [document.getElementById('clock'), document.getElementById('clock2')]) if (el) el.textContent = t;
+}
+tick(); setInterval(tick, 30000);
+
+/* ————— Preloader ————— */
+const loader = document.querySelector('.loader');
+const count = document.querySelector('.loader-count');
+const heroLines = document.querySelectorAll('.hero-title .line > span');
+
+const intro = gsap.timeline({ defaults:{ ease:'expo.out' } });
+intro
+  .to('.loader-word span', { y: 0, duration: 1, delay: .2 })
+  .to(count, {
+    innerText: 100, duration: 1.4, snap: { innerText: 1 }, ease: 'power2.inOut',
+    onUpdate(){ count.textContent = String(Math.round(gsap.getProperty(count,'innerText'))).padStart(2,'0'); }
+  }, '<')
+  .to(loader, { yPercent: -100, duration: 1.1, ease: 'expo.inOut' })
+  .set(loader, { display:'none' })
+  .to(heroLines, { y: 0, duration: 1.4, stagger: .12 }, '-=0.55')
+  .fromTo('.hero-image', { clipPath:'inset(100% 0 0 0)' }, { clipPath:'inset(0% 0 0 0)', duration: 1.3, ease:'expo.inOut' }, '-=1.1')
+  .fromTo('.hero-meta, .hero-sub p, .hero-scroll, .nav', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: .9, stagger: .08, clearProps:'transform' }, '-=0.8');
+
+if (reduced) { intro.progress(1); }
+
+/* ————— Scroll progress ————— */
+gsap.to('.progress', {
+  scaleX: 1, ease: 'none',
+  scrollTrigger: { start: 0, end: 'max', scrub: .3 }
+});
+
+/* ————— Nav hide / reveal ————— */
+const nav = document.querySelector('.nav');
+let lastY = 0;
+ScrollTrigger.create({
+  start: 0, end: 'max',
+  onUpdate(self){
+    const y = self.scroll();
+    nav.classList.toggle('is-hidden', y > lastY && y > 120);
+    lastY = y;
+  }
+});
+
+/* ————— Generic reveals ————— */
+document.querySelectorAll('.rv').forEach(el => {
+  gsap.to(el, {
+    opacity: 1, y: 0, duration: 1.2, ease: 'expo.out',
+    scrollTrigger: { trigger: el, start: 'top 85%' }
+  });
+});
+document.querySelectorAll('.rv-l').forEach(el => {
+  gsap.to(el, {
+    opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.1, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 88%' }
+  });
+});
+
+/* ————— Image parallax & scale ————— */
+document.querySelectorAll('[data-parallax]').forEach(el => {
+  const amt = parseFloat(el.dataset.parallax) || .1;
+  gsap.to(el.querySelector('img'), {
+    yPercent: -amt * 100, ease: 'none',
+    scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true }
+  });
+});
+document.querySelectorAll('[data-scale] img').forEach(img => {
+  gsap.fromTo(img, { yPercent: -8, scale: 1.06 }, {
+    yPercent: 0, scale: 1, ease: 'none',
+    scrollTrigger: { trigger: img.closest('[data-scale]'), start: 'top bottom', end: 'bottom top', scrub: true }
+  });
+});
+
+/* ————— Project numbers drift ————— */
+document.querySelectorAll('.project-num').forEach(el => {
+  gsap.fromTo(el, { yPercent: 30, opacity: 0 }, {
+    yPercent: 0, opacity: 1, ease: 'power2.out', duration: 1,
+    scrollTrigger: { trigger: el.closest('.project'), start: 'top 70%' }
+  });
+});
+
+/* ————— Tech marquee: constant drift + scroll velocity ————— */
+document.querySelectorAll('[data-marquee]').forEach(row => {
+  const dir = parseFloat(row.dataset.marquee) || 1;
+  const track = row.querySelector('.tech-track');
+  let x = 0, vel = 0;
+  ScrollTrigger.create({
+    trigger: row, start: 'top bottom', end: 'bottom top',
+    onUpdate(self){ vel = self.getVelocity() / 2500; }
+  });
+  gsap.ticker.add(() => {
+    x -= dir * (0.6 + Math.abs(vel));
+    vel *= 0.92;
+    const half = track.scrollWidth / 2;
+    if (x <= -half) x += half;
+    if (x >= 0) x -= half;
+    track.style.transform = `translate3d(${x}px,0,0)`;
+  });
+});
+
+/* ————— Custom cursor ————— */
+const cursor = document.querySelector('.cursor');
+if (cursor && window.matchMedia('(hover:hover) and (pointer:fine)').matches) {
+  const pos = { x: innerWidth/2, y: innerHeight/2 }, target = { ...pos };
+  addEventListener('mousemove', e => { target.x = e.clientX; target.y = e.clientY; });
+  gsap.ticker.add(() => {
+    pos.x += (target.x - pos.x) * .18;
+    pos.y += (target.y - pos.y) * .18;
+    cursor.style.transform = `translate(${pos.x}px,${pos.y}px) translate(-50%,-50%)`;
+  });
+  document.addEventListener('mouseover', e => {
+    if (e.target.closest('[data-cursor="view"]') || e.target.closest('.project-media')) cursor.className = 'cursor is-view';
+    else if (e.target.closest('a,button')) cursor.className = 'cursor is-link';
+    else cursor.className = 'cursor';
+  });
+  document.addEventListener('mouseleave', () => cursor.classList.add('is-hidden'));
+  document.addEventListener('mouseenter', () => cursor.classList.remove('is-hidden'));
+}
+
+/* ————— Magnetic elements ————— */
+document.querySelectorAll('[data-magnetic]').forEach(el => {
+  const strength = 18;
+  el.addEventListener('mousemove', e => {
+    const r = el.getBoundingClientRect();
+    gsap.to(el, {
+      x: (e.clientX - r.left - r.width/2) / r.width * strength,
+      y: (e.clientY - r.top - r.height/2) / r.height * strength,
+      duration: .4, ease: 'power3.out'
+    });
+  });
+  el.addEventListener('mouseleave', () => gsap.to(el, { x: 0, y: 0, duration: .7, ease: 'expo.out' }));
+});
+
+/* ————— Anchor scrolling via Lenis ————— */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (!target) return;
+    e.preventDefault();
+    if (lenis) lenis.scrollTo(target, { offset: 0, duration: 1.4 });
+    else target.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+</script>
+</body>
+</html>
